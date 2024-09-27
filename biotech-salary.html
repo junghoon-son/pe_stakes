@@ -458,18 +458,6 @@ define({id: "e3b0c442", body: () => {
 
 }});
 
-define({id: "c66661a8", mode: "inline", inputs: ["Inputs","search_result","display"], body: async (Inputs,search_result,display) => {
-display(await(
-Inputs.table(search_result)
-))
-}});
-
-define({id: "1e1a8cfc", mode: "inline", inputs: ["Inputs","degree_counts","display"], body: async (Inputs,degree_counts,display) => {
-display(await(
-Inputs.table(degree_counts)
-))
-}});
-
 </script>
 <input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
 <label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
@@ -563,10 +551,12 @@ ${industry_boxplot}
 </div>
 <div class="observablehq observablehq--block"><!--:2ac559af:--></div>
 <div class="observablehq observablehq--block"><!--:e3b0c442:--></div>
-<div class="card" style="background: none; padding: 2px;">
-<observablehq-loading></observablehq-loading><!--:c66661a8:-->
-<p><observablehq-loading></observablehq-loading><!--:1e1a8cfc:--></p>
+<!-- <div class="card" style="background: none; padding: 2px;">
+${Inputs.table(search_result)}
 </div>
+<div>
+${Inputs.table(degree_counts)}
+</div> -->
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./pe_hospitals"><span>PE Hospitals Tracker</span></a></nav>

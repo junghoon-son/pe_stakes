@@ -375,7 +375,7 @@ const legendScale = plot_object.scale("color")
 return {legendScale};
 }});
 
-define({id: "4b1f9be5", inputs: ["d3","Plot","lookup_occ_title","lookup_naics_title"], outputs: ["counts_plot"], body: (d3,Plot,lookup_occ_title,lookup_naics_title) => {
+define({id: "2929d85e", inputs: ["d3","Plot","lookup_occ_title","lookup_naics_title"], outputs: ["counts_plot"], body: (d3,Plot,lookup_occ_title,lookup_naics_title) => {
 const counts_plot = function(data) {
   const y_max = d3.max([...data], d => isNaN(+d.total_employment) ? -Infinity : +d.total_employment)
   const y_max_padding = y_max + 0.4 * y_max
@@ -385,15 +385,11 @@ const counts_plot = function(data) {
         style: {
           fontSize: 13,
         },
-        // marginTop: 0,
-        // paddingLeft: 1000,
         marginLeft: 75, 
         marginBottom: 40,
         paddingLeft: 0,
-        paddingRight: 0,
-        // marginRight: 100, 
+        paddingRight: 0, 
         marginBottom: 70,
-        // width: 600,
         height: (parseInt(grouping_limit_input) == 1) ? 350: (155 * parseInt(grouping_limit_input) + 10),
         backgroundColor: "white",
         color: {
@@ -819,7 +815,7 @@ ORDER BY
 return {naics_occ_wages};
 }});
 
-define({id: "9ca160ae", inputs: ["sql","sql_array_str"], outputs: ["naics_occ_state_wages"], body: (sql,sql_array_str) => {
+define({id: "8ceece8b", inputs: ["sql","sql_array_str"], outputs: ["naics_occ_state_wages"], body: (sql,sql_array_str) => {
 const naics_occ_state_wages = async function (selected_codes, grouping_limit=5) {
   const other_industries_label = grouping_limit > 0 ? "Other Industries" : "All Industries";
   const other_industries_code = grouping_limit > 0 ? "Other" : "All Industries";
@@ -833,8 +829,7 @@ const naics_occ_state_wages = async function (selected_codes, grouping_limit=5) 
     AREA,
     AREA_TITLE
   FROM oes_state_wages
-  WHERE OCC_CODE IN (${sql_array_str(selected_codes)}) 
-    AND RIGHT(OCC_CODE, 1) != '0'
+  WHERE OCC_CODE IN (${sql_array_str(selected_codes)})
     AND RESULT_TYPE = 'A_MEDIAN'
 ),
 final_data_with_changes AS (
@@ -883,14 +878,14 @@ define({id: "10f1286e", body: () => {
 // occ_state_wages
 }});
 
-define({id: "d07663b1", inputs: ["d3","selected_codes","top_naics","Plot","width","lookup_naics_title","lookup_occ_title"], outputs: ["naicc_wages_plot"], body: (d3,selected_codes,top_naics,Plot,width,lookup_naics_title,lookup_occ_title) => {
+define({id: "b341dac4", inputs: ["d3","selected_codes","top_naics","Plot","width","lookup_naics_title","lookup_occ_title"], outputs: ["naicc_wages_plot"], body: (d3,selected_codes,top_naics,Plot,width,lookup_naics_title,lookup_occ_title) => {
 const naicc_wages_plot = (occ_wages, area_code) => {
   const selected_state_occ_wages = [...occ_wages].some(d => 'AREA' in d) 
-    ? [...occ_wages].filter(d => d.AREA == area_code)
-    : [...occ_wages];
+    ? [...occ_wages].filter(d => d.AREA == area_code) : [...occ_wages];
   const y_max = d3.max([...occ_wages].filter(d=>[...selected_codes].includes(d.OCC_CODE)).map(d => isNaN(+d.VALUE) ? -Infinity : +d.VALUE))
-    // console.log(y_max)
   const y_max_padding = y_max + 0.10 * y_max
+  // const y_max = d3.max([...occ_wages].filter(d=>[...selected_codes].includes(d.OCC_CODE)).map(d => isNaN(+d.VALUE) ? -Infinity : +d.VALUE))
+  // const y_max_padding = y_max + 0.10 * y_max
   const grouping_limit_input = (new Set([...occ_wages].filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE)).map((d) => d.NAICS))).size;
 
   const get_plot = Plot.plot({
@@ -915,9 +910,9 @@ const naicc_wages_plot = (occ_wages, area_code) => {
       label: null,
       axis: null,
     },
-    // height: (parseInt(grouping_limit_input) == 1) ? 110: (100 * parseInt(grouping_limit_input) + 10),
-    height: 300,
-    width: width,
+    height: (parseInt(grouping_limit_input) == 1) ? 300: (300 * parseInt(grouping_limit_input) + 10),
+    // height: 300,
+    width: width * 0.8,
       marks: [
       Plot.ruleY([0]),
       Plot.axisX({
@@ -937,7 +932,7 @@ const naicc_wages_plot = (occ_wages, area_code) => {
         Plot.selectFirst(
           {
             text: (d) => lookup_naics_title(d.NAICS), 
-            fx: (d) => lookup_naics_title(d.NAICS), 
+            fy: (d) => lookup_naics_title(d.NAICS), 
             frameAnchor: "top-left",
             fontSize: 16,
             z: 100,
@@ -960,12 +955,12 @@ const naicc_wages_plot = (occ_wages, area_code) => {
         // strokeColor: (d) => lookup_naics_title(d.NAICS),
         stroke: 1,
         // dx: ,
-        fx: (d) => lookup_naics_title(d.NAICS), strokeWidth: 2, 
+        fy: (d) => lookup_naics_title(d.NAICS), strokeWidth: 2, 
         stroke: "#eee",
-        strokeOpacity: 0.4, sort: {y: "-x"}, tip: true}
+        strokeOpacity: 0.4, sort: {y: "-x"}}
       ),
       Plot.dot(
-        [...occ_wages].filter(d=>[...top_naics].includes(d.NAICS)),
+        [...occ_wages].filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE)),
         {
           y: "VALUE", 
           x: (d) => new Date(d.REPORT_DATE), 
@@ -979,36 +974,43 @@ const naicc_wages_plot = (occ_wages, area_code) => {
             test: "VALUE",
             Name: (d) => lookup_occ_title(d.OCC_CODE),
           },
-          // fx: (d) => [...selected_codes].includes(d.OCC_CODE) ? lookup_occ_title(d.OCC_CODE) : null, strokeWidth: 4, sort: {y: "-x"}
+          // fy: (d) => [...selected_codes].includes(d.OCC_CODE) ? lookup_occ_title(d.OCC_CODE) : null, strokeWidth: 4, sort: {y: "-x"}
         }
       ),
       Plot.dot(
         selected_state_occ_wages.filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE)),
         {y: "VALUE", 
         x: (d) => new Date(d.REPORT_DATE), 
-        stroke: (d) => d.OCC_CODE,
+        // stroke: (d) => d.OCC_CODE,
+        stroke: (d) => lookup_naics_title(d.NAICS),
         fill: (d) => lookup_naics_title(d.NAICS),
         r: 3,
         // dx: ,
-        fx: (d) => lookup_naics_title(d.NAICS), strokeWidth: 4, sort: {y: "-x"}}
+        fy: (d) => lookup_naics_title(d.NAICS), strokeWidth: 4, sort: {y: "-x"}}
       ),
       Plot.line(
         selected_state_occ_wages.filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE)),
         {y: "VALUE", 
         x: (d) => new Date(d.REPORT_DATE), 
         sort: (d) => new Date(d.REPORT_DATE),
-        stroke: (d) => d.OCC_CODE,
+        // stroke: (d) => d.OCC_CODE,
+        stroke: (d) => lookup_naics_title(d.NAICS),
         // strokeColor: (d) => lookup_naics_title(d.NAICS),
         r: 3,
         // dx: ,
-        fx: (d) => lookup_naics_title(d.NAICS), strokeWidth: 4, sort: {y: "-x"}, tip: true}
+        fy: (d) => lookup_naics_title(d.NAICS), 
+        strokeWidth: 4, 
+        sort: {y: "-x"}, 
+        tip: true}
       ),
       Plot.text(
-        selected_state_occ_wages.filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE)),
+        selected_state_occ_wages.filter(d=>[...top_naics].includes(d.NAICS)).filter(d=>[...selected_codes].includes(d.OCC_CODE))
+        .sort((a, b) => new Date(a.REPORT_DATE) - new Date(b.REPORT_DATE))
+        .map((item, i) => ({ ...item, isEven: i % 2 === 0 })),
         {
-          text: d => `${d3.format("$,.3s")(d.VALUE)}`,
+          text: (d) => d.isEven ? `${d3.format("$,.3s")(d.VALUE)}` : '',
           x: (d) => new Date(d.REPORT_DATE), 
-          fx: (d) => lookup_naics_title(d.NAICS),
+          fy: (d) => lookup_naics_title(d.NAICS),
           y: "VALUE", 
           z: 100,
           textAnchor: "center",
@@ -1025,7 +1027,7 @@ const naicc_wages_plot = (occ_wages, area_code) => {
       //   x: (d) => new Date(d.REPORT_DATE), 
       //   stroke: (d) => lookup_occ_title(d.OCC_CODE),
       //   r: 5,
-      //   fx: (d) => lookup_naics_title(d.NAICS), strokeWidth: 4, sort: {y: "-x"}, tip: true}
+      //   fy: (d) => lookup_naics_title(d.NAICS), strokeWidth: 4, sort: {y: "-x"}, tip: true}
       // ),
     ]
   })
@@ -1060,6 +1062,17 @@ const top_naics = aq.from([...occ_state_counts])
   .objects()
   .map(d => d.NAICS);
 return {top_naics};
+}});
+
+define({id: "81aa71cf", inputs: ["Inputs","occ_wages","top_naics","selected_codes","display"], body: async (Inputs,occ_wages,top_naics,selected_codes,display) => {
+display(await(
+Inputs.table(
+  [...occ_wages]
+  .filter(d=>[...top_naics].includes(d.NAICS))
+  .filter(d=>[...selected_codes].includes(d.OCC_CODE))
+  .map((item, i, arr) => ({ ...item, isEven: (arr.length - 1 - i) % 2 === 0 }))
+)
+))
 }});
 
 </script>
@@ -1166,7 +1179,7 @@ return {top_naics};
 <div class="observablehq observablehq--block"><!--:ea6a5532:--></div>
 <div class="observablehq observablehq--block"><!--:1e565f07:--></div>
 <p><span class="align: right">Source: Bureau of Labor Statistics</span></p>
-<div class="observablehq observablehq--block"><!--:4b1f9be5:--></div>
+<div class="observablehq observablehq--block"><!--:2929d85e:--></div>
 <hr>
 <div class="observablehq observablehq--block"><!--:f0fa738e:--></div>
 <div class="observablehq observablehq--block"><!--:a979d767:--></div>
@@ -1195,14 +1208,15 @@ return {top_naics};
 </ul>
 <div class="observablehq observablehq--block"><!--:cb0b3d78:--></div>
 <div class="observablehq observablehq--block"><!--:358c4f8f:--></div>
-<div class="observablehq observablehq--block"><!--:9ca160ae:--></div>
+<div class="observablehq observablehq--block"><!--:8ceece8b:--></div>
 <div class="observablehq observablehq--block"><!--:ac054772:--></div>
 <div class="observablehq observablehq--block"><!--:c6cd8bc6:--></div>
 <div class="observablehq observablehq--block"><!--:10f1286e:--></div>
-<div class="observablehq observablehq--block"><!--:d07663b1:--></div>
+<div class="observablehq observablehq--block"><!--:b341dac4:--></div>
 <div class="observablehq observablehq--block"><!--:39669456:--></div>
 <div class="observablehq observablehq--block"><!--:add74dd2:--></div>
 <div class="observablehq observablehq--block"><!--:85b2195e:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:81aa71cf:--></div>
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./healthcare-labor-v2"><span>Healthcare Labor Statistics V2</span></a><a rel="next" href="./occupation-search"><span>Occupation Explorer</span></a></nav>

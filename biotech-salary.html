@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Biotech Levels | Clinicians.fyi</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air,wide.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,wide.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.css">
+<link rel="modulepreload" href="./_observablehq/client.js">
+<link rel="modulepreload" href="./_observablehq/runtime.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/_esm.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/_esm.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/_esm.js">
+<script type="module">
+
+import {define} from "./_observablehq/client.js";
+import {registerFile} from "./_observablehq/stdlib.js";
+
+registerFile("./data/biotech_levels.csv", {"name":"./data/biotech_levels.csv","mimeType":"text/csv","path":"./data/biotech_levels.csv"});
+
+define({id: "9b176f1a", inputs: ["FileAttachment"], outputs: ["biotech_levels_data"], body: (FileAttachment) => {
+const biotech_levels_data = FileAttachment("./data/biotech_levels.csv").csv({typed: true});
+return {biotech_levels_data};
+}});
+
+define({id: "2aad0ea3", inputs: ["Inputs","biotech_levels_data"], outputs: ["search_input"], body: (Inputs,biotech_levels_data) => {
+// Free-text search
+const search_input = Inputs.search(biotech_levels_data, {placeholder: "Search all fields"});
+return {search_input};
+}});
+
+define({id: "580ff2cc", inputs: ["Generators","search_input"], outputs: ["search_result"], body: (Generators,search_input) => {
+// Generator for the results
+const search_result = Generators.input(search_input);
+return {search_result};
+}});
+
+define({id: "36ab3524", body: () => {
+// const naics_occ_count = await sql(
+//   """SELECT * From 
+//   """
+// )
+}});
+
+define({id: "2ec65455", outputs: ["GLOBAL_HEIGHT"], body: () => {
+const GLOBAL_HEIGHT = 350;
+return {GLOBAL_HEIGHT};
+}});
+
+define({id: "54aa5a83", inputs: ["Plot","width","GLOBAL_HEIGHT","search_result","biotech_levels_data"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,search_result,biotech_levels_data) => {
+const main_fig = Plot.plot({
+  width: width,
+  height: GLOBAL_HEIGHT,
+  y: {
+    domain: [0, 650000],
+  },
+  x: {
+    domain: [0, 35],
+  },
+  color: {
+    // legend: true,
+  },
+  marks: [
+    Plot.frame(),
+    Plot.axisX({
+      interval: 1,
+      // rotate: -90,
+      dx: -5,
+      marginLeft: 100, 
+      paddingLeft: 20,
+      marginTop: 50, 
+      paddingRight: 20,
+    }),
+    Plot.dot(
+      search_result, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay", 
+      fill: "red",
+      stroke: "red",
+    }),
+    Plot.dot(biotech_levels_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay", 
+      channel: ["Compensation - Sign on Bonus Value"],
+      opacity: 0.2,
+      stroke: "gray",
+      tip: true,
+    }),
+    Plot.linearRegressionY(biotech_levels_data, {
+      x: "Years of Experience", 
+      y: "Compensation - Annual Base Salary/Pay", 
+      stroke: "gray",
+      opacity: 0.5,
+    }),
+    Plot.linearRegressionY(search_result, {
+      x: "Years of Experience", 
+      y: "Compensation - Annual Base Salary/Pay", 
+      stroke: "red",
+    }),
+    Plot.ruleY(biotech_levels_data, Plot.pointerX({
+        px: "Years of Experience", 
+        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
+        stroke: "red"}
+    )),
+    Plot.text(biotech_levels_data, Plot.pointerX({
+        px: "Years of Experience", 
+        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
+        frameAnchor: "left", 
+        textAnchor: "end",
+        fill: "red",
+        fontWeight: 600,
+        fontSize: 20,
+        dx: -10,
+        text: d => parseInt(d["Compensation - Annual Base Salary/Pay"])
+        })),
+    Plot.dot(biotech_levels_data, Plot.pointerX({x: "Years of Experience", y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), stroke: "red", fill: "white"})),
+  ]
+})
+return {main_fig};
+}});
+
+define({id: "52c1d7cf", mode: "inline", inputs: ["search_input","display"], body: async (search_input,display) => {
+display(await(
+search_input
+))
+}});
+
+define({id: "16e5b87a", inputs: ["Plot","width","GLOBAL_HEIGHT","biotech_levels_data","search_result"], outputs: ["comp_boxplot"], body: (Plot,width,GLOBAL_HEIGHT,biotech_levels_data,search_result) => {
+const comp_boxplot = Plot.plot({
+  width: width,
+  height: GLOBAL_HEIGHT,
+  marks: [
+    Plot.frame(),
+    Plot.axisX({
+      interval: 1,
+      // rotate: -90,
+      marginLeft: 100, 
+      paddingLeft: 20,
+      marginTop: 50, 
+      paddingRight: 20,
+    }),
+    Plot.ruleY([0]),
+    Plot.boxY(biotech_levels_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay", 
+      opacity: 0.5,
+      // tip: true
+    }),
+    Plot.boxY(search_result, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay", 
+      fill: "red"
+    })
+  ]
+})
+return {comp_boxplot};
+}});
+
+define({id: "9bd0cf97", inputs: ["biotech_levels_data"], outputs: ["top_hubs"], body: (biotech_levels_data) => {
+const top_hubs = biotech_levels_data.filter(d => d["Hub Mapped"]!=null)
+return {top_hubs};
+}});
+
+define({id: "147c8ce3", inputs: ["search_result"], outputs: ["top_hubs_search"], body: (search_result) => {
+const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null)
+return {top_hubs_search};
+}});
+
+define({id: "51d6693c", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+const hub_boxplot = Plot.plot({
+  width: width,
+  height: 700,
+  marks: [
+    Plot.frame(),
+    Plot.axisY({
+      marginLeft: 200, 
+      paddingLeft: 20,
+      marginTop: 50, 
+      paddingRight: 20,
+    }),
+    Plot.boxX(top_hubs, {
+      y: "Hub Mapped",
+      x: "Compensation - Annual Base Salary/Pay", 
+      opacity: 0.8,
+      sort: {y: "x", reverse: true}
+    }),
+    Plot.boxX(top_hubs_search, {
+      y: "Hub Mapped",
+      x: "Compensation - Annual Base Salary/Pay", 
+      opacity: 0.8,
+      fill: "red",
+      sort: {y: "x", reverse: true}
+    }),
+  ]
+})
+return {hub_boxplot};
+}});
+
+define({id: "9ef9eb00", mode: "inline", inputs: ["main_fig","display"], body: async (main_fig,display) => {
+display(await(
+main_fig
+))
+}});
+
+define({id: "a95b3907", mode: "inline", inputs: ["comp_boxplot","display"], body: async (comp_boxplot,display) => {
+display(await(
+comp_boxplot
+))
+}});
+
+define({id: "1d45ffef", inputs: ["search_result"], outputs: ["hub_check"], body: (search_result) => {
+const hub_check = [...new Set(search_result.map(d => d['Where is the closest major city or hub?']))]
+return {hub_check};
+}});
+
+define({id: "2b7a343f", mode: "inline", inputs: ["hub_boxplot","display"], body: async (hub_boxplot,display) => {
+display(await(
+hub_boxplot
+))
+}});
+
+define({id: "c66661a8", mode: "inline", inputs: ["Inputs","search_result","display"], body: async (Inputs,search_result,display) => {
+display(await(
+Inputs.table(search_result)
+))
+}});
+
+</script>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link"><a href="./">Clinicians.fyi</a></li>
+  </ol>
+  <details open>
+    <summary>Healthcare Fraud</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./healthcare-fraud">Criminal Cases</a></li>
+    <li class="observablehq-link"><a href="./healthcare-fraud-startups">Startups/Health Tech</a></li>
+    </ol>
+  </details>
+  <details open>
+    <summary>Labor</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./healthcare-labor">Healthcare Labor Statistics</a></li>
+    <li class="observablehq-link"><a href="./healthcare-labor-v2">Healthcare Labor Statistics V2</a></li>
+    <li class="observablehq-link"><a href="./healthcare-labor-wages">Healthcare Wages</a></li>
+    <li class="observablehq-link"><a href="./occupation-search">Occupation Explorer</a></li>
+    </ol>
+  </details>
+  <details open>
+    <summary>Hospital Ownership</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./pe_hospitals">PE Hospitals Tracker</a></li>
+    </ol>
+  </details>
+</nav>
+<script>{Object.assign(document.createElement("a"),{href:""}).password&&location.replace(location.href);const e=document.querySelector("#observablehq-sidebar"),t=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?t.checked=r==="true":t.indeterminate=!0;for(const o of document.querySelectorAll("#observablehq-sidebar summary")){const s=o.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${o.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<aside id="observablehq-toc" data-selector="h1:not(:first-of-type)[id], h2:first-child[id], :not(h1) + h2[id]">
+<nav>
+<div>Contents</div>
+<ol>
+<li class="observablehq-secondary-link"><a href="#compensation">Compensation</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-years-of-experience">∟ By Years of Experience</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-location">∟ By Location</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-industry">∟ By Industry</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-title">∟ By Title</a></li>
+</ol>
+</nav>
+</aside>
+<div id="observablehq-center">
+<main id="observablehq-main" class="observablehq">
+<h1 id="biotech-levels" tabindex="-1"><a class="observablehq-header-anchor" href="#biotech-levels">Biotech Levels</a></h1>
+<div class="observablehq observablehq--block"><!--:9b176f1a:--></div>
+<div class="observablehq observablehq--block"><!--:2aad0ea3:--></div>
+<div class="observablehq observablehq--block"><!--:580ff2cc:--></div>
+<div class="observablehq observablehq--block"><!--:36ab3524:--></div>
+<div class="observablehq observablehq--block"><!--:2ec65455:--></div>
+<div class="observablehq observablehq--block"><!--:54aa5a83:--></div>
+<h1 id="compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation">Compensation</a></h1>
+<p>This data is collected from</p>
+<h2 id="%E2%88%9F-by-years-of-experience" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-years-of-experience">∟ By Years of Experience</a></h2>
+<p>Search for any text (e.g. "AbbVie", "Scientist", "Director", "Boston")</p>
+<p><observablehq-loading></observablehq-loading><!--:52c1d7cf:--></p>
+<div class="observablehq observablehq--block"><!--:16e5b87a:--></div>
+<div class="observablehq observablehq--block"><!--:9bd0cf97:--></div>
+<div class="observablehq observablehq--block"><!--:147c8ce3:--></div>
+<div class="observablehq observablehq--block"><!--:51d6693c:--></div>
+<div class="card" style="background: none; padding: 20px;">
+<observablehq-loading></observablehq-loading><!--:9ef9eb00:-->
+<observablehq-loading></observablehq-loading><!--:a95b3907:-->
+</div>
+<div class="observablehq observablehq--block"><!--:1d45ffef:--></div>
+<h2 id="%E2%88%9F-by-location" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-location">∟ By Location</a></h2>
+<div class="card" style="background: none; padding: 20px;">
+<observablehq-loading></observablehq-loading><!--:2b7a343f:-->
+</div>
+<h2 id="%E2%88%9F-by-industry" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-industry">∟ By Industry</a></h2>
+<p>test</p>
+<h2 id="%E2%88%9F-by-title" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-title">∟ By Title</a></h2>
+<p>test</p>
+<div class="card" style="background: none; padding: 2px;">
+<observablehq-loading></observablehq-loading><!--:c66661a8:-->
+</div></main>
+<footer id="observablehq-footer">
+<div>Built with Observable.</div>
+</footer>
+</div>

@@ -12,12 +12,12 @@
 <link rel="modulepreload" href="./_observablehq/client.js">
 <link rel="modulepreload" href="./_observablehq/runtime.js">
 <link rel="modulepreload" href="./_observablehq/stdlib.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
 <link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/_esm.js">
 <link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
-<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-brush@3.0.0/_esm.js">
@@ -27,7 +27,6 @@
 <link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-drag@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-ease@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-force@3.0.0/_esm.js">
@@ -48,13 +47,28 @@
 <link rel="modulepreload" href="./_npm/d3-timer@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-transition@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
 <link rel="modulepreload" href="./_npm/internmap@2.0.3/_esm.js">
 <link rel="modulepreload" href="./_npm/delaunator@5.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/_esm.js">
 <script type="module">
 
 import {define} from "./_observablehq/client.js";
+import {registerFile, FileAttachment} from "./_observablehq/stdlib.js";
+import {registerTable} from "./_observablehq/stdlib/duckdb.js";
+
+registerFile("./data/biotech_levels.csv", {"name":"./data/biotech_levels.csv","mimeType":"text/csv","path":"./_file/data/biotech_levels.e1c18d5b.csv","lastModified":1727445672396});
+registerTable("biotech_levels", FileAttachment("./data/biotech_levels.csv"));
+
+define({id: "9b176f1a", inputs: ["FileAttachment"], outputs: ["biotech_levels_data"], body: (FileAttachment) => {
+const biotech_levels_data = FileAttachment("./data/biotech_levels.csv").csv({typed: true});
+return {biotech_levels_data};
+}});
+
+define({id: "01ba4719", body: () => {
+
+}});
 
 define({id: "2aad0ea3", inputs: ["Inputs","biotech_levels_data"], outputs: ["search_input"], body: (Inputs,biotech_levels_data) => {
 // Free-text search
@@ -80,8 +94,9 @@ const GLOBAL_HEIGHT = 350;
 return {GLOBAL_HEIGHT};
 }});
 
-define({id: "54aa5a83", inputs: ["Plot","width","GLOBAL_HEIGHT","search_result","biotech_levels_data"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,search_result,biotech_levels_data) => {
+define({id: "c00f07c7", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
 const main_fig = Plot.plot({
+  title: "Annual Compensation vs. Years of Experience",
   width: width,
   height: GLOBAL_HEIGHT,
   y: {
@@ -89,35 +104,62 @@ const main_fig = Plot.plot({
   },
   x: {
     domain: [0, 35],
+    insetLeft: 90
   },
   color: {
     // legend: true,
   },
   marks: [
-    Plot.frame(),
+    // Plot.frame(),
+    Plot.ruleY([0]),
+    Plot.gridY({
+      strokeDasharray: "0.75,2", // dashed
+      strokeOpacity: 1 // opaque
+    }),
+    Plot.axisY({
+      tickSize: 0,
+      dx: 65,
+      dy: -5,
+      lineAnchor: "bottom", // draw labels above grid lines
+      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
+      tickFormat: d => `${d3.format("$,.0f")(d)}`
+    }),
     Plot.axisX({
       interval: 1,
       // rotate: -90,
-      dx: -5,
-      marginLeft: 100, 
-      paddingLeft: 20,
-      marginTop: 50, 
-      paddingRight: 20,
+      // dx: -5,
+      // marginLeft: 100,
+      // marginTop: 50, 
+    }),
+    Plot.dot(biotech_levels_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay", 
+      channels: {
+        "Institution": "Company or Institution Name",
+        "Position": "[Optional] Briefly describe your position",
+        "Annual Pay": "Compensation - Annual Base Salary/Pay"
+      },
+      opacity: 0.2,
+      stroke: "gray",
+      tip: {
+        "Annual Pay": true,
+        "Position": true,
+        "x": false,
+        "y": false,
+        lineWidth: 600,
+        anchor: "bottom",
+        fill: "#f4f4f4",
+        lineHeight: 1.5,
+      },
     }),
     Plot.dot(
       search_result, {
       x: "Years of Experience",
       y: "Compensation - Annual Base Salary/Pay", 
-      fill: "red",
+      fill: "#eeffff",
       stroke: "red",
-    }),
-    Plot.dot(biotech_levels_data, {
-      x: "Years of Experience",
-      y: "Compensation - Annual Base Salary/Pay", 
-      channel: ["Compensation - Sign on Bonus Value"],
-      opacity: 0.2,
-      stroke: "gray",
-      tip: true,
+      opacity: 0.6,
+      r: 5,
     }),
     Plot.linearRegressionY(biotech_levels_data, {
       x: "Years of Experience", 
@@ -133,20 +175,29 @@ const main_fig = Plot.plot({
     Plot.ruleY(biotech_levels_data, Plot.pointerX({
         px: "Years of Experience", 
         y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
-        stroke: "red"}
+        insetLeft: 65,
+        stroke: "green"}
     )),
     Plot.text(biotech_levels_data, Plot.pointerX({
         px: "Years of Experience", 
         y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
         frameAnchor: "left", 
-        textAnchor: "end",
-        fill: "red",
+        textAnchor: "right",
+        fill: "green",
         fontWeight: 600,
         fontSize: 20,
-        dx: -10,
+        dx: 20,
+        backgroundColor: "white",
         text: d => parseInt(d["Compensation - Annual Base Salary/Pay"])
-        })),
-    Plot.dot(biotech_levels_data, Plot.pointerX({x: "Years of Experience", y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), stroke: "red", fill: "white"})),
+      }
+    )),
+    Plot.dot(biotech_levels_data, Plot.pointerX({
+        x: "Years of Experience", 
+        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
+        stroke: "red", 
+        fill: "white"
+      }
+    )),
   ]
 })
 return {main_fig};
@@ -158,58 +209,80 @@ search_input
 ))
 }});
 
-define({id: "16e5b87a", inputs: ["Plot","width","GLOBAL_HEIGHT","biotech_levels_data","search_result"], outputs: ["comp_boxplot"], body: (Plot,width,GLOBAL_HEIGHT,biotech_levels_data,search_result) => {
+define({id: "ceecdaf3", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["comp_boxplot"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
 const comp_boxplot = Plot.plot({
   width: width,
   height: GLOBAL_HEIGHT,
+  y: {
+    domain: [0, 650000],
+  },
+  x: {
+    domain: [...Array(36).keys()],
+    insetLeft: 90
+  },
   marks: [
-    Plot.frame(),
+    Plot.gridY({
+      strokeDasharray: "0.75,2", 
+      strokeOpacity: 1
+    }),
+    Plot.axisY({
+      tickSize: 0,
+      dx: 65,
+      dy: -5,
+      lineAnchor: "bottom",
+      tickFormat: (d) => (`${d3.format("$,.0f")(d)}`)
+    }),
     Plot.axisX({
-      interval: 1,
-      // rotate: -90,
-      marginLeft: 100, 
-      paddingLeft: 20,
-      marginTop: 50, 
-      paddingRight: 20,
+      // interval: 1,
+      // marginTop: 50, 
     }),
     Plot.ruleY([0]),
     Plot.boxY(biotech_levels_data, {
       x: "Years of Experience",
       y: "Compensation - Annual Base Salary/Pay", 
       opacity: 0.5,
-      // tip: true
     }),
     Plot.boxY(search_result, {
       x: "Years of Experience",
       y: "Compensation - Annual Base Salary/Pay", 
       fill: "red"
     })
-  ]
-})
+  ]})
 return {comp_boxplot};
 }});
 
-define({id: "9bd0cf97", inputs: ["biotech_levels_data"], outputs: ["top_hubs"], body: (biotech_levels_data) => {
-const top_hubs = biotech_levels_data.filter(d => d["Hub Mapped"]!=null)
+define({id: "a41c142d", inputs: ["biotech_levels_data"], outputs: ["top_hubs"], body: (biotech_levels_data) => {
+const top_hubs = biotech_levels_data.filter(d => d["Hub Mapped"]!=null).filter(d => d["Hub Count"]>5)
 return {top_hubs};
 }});
 
-define({id: "147c8ce3", inputs: ["search_result"], outputs: ["top_hubs_search"], body: (search_result) => {
-const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null)
+define({id: "59112a8e", inputs: ["search_result"], outputs: ["top_hubs_search"], body: (search_result) => {
+const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null).filter(d => d["Hub Count"]>5)
 return {top_hubs_search};
 }});
 
-define({id: "51d6693c", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "d612707d", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
 const hub_boxplot = Plot.plot({
   width: width,
   height: 700,
+  x: {
+    domain: [0, 650000],
+    insetLeft: 200
+  },
   marks: [
-    Plot.frame(),
+    Plot.ruleY([0]),
+    Plot.gridY({
+      strokeDasharray: "0.75,2", // dashed
+      strokeOpacity: 1 // opaque
+    }),
     Plot.axisY({
-      marginLeft: 200, 
-      paddingLeft: 20,
-      marginTop: 50, 
-      paddingRight: 20,
+      tickSize: 0,
+      dx: 10,
+      dy: -5,
+      textAnchor: "start",
+      lineAnchor: "bottom", // draw labels above grid lines
+      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
+      // tickFormat: d => `${d3.format("$,.0f")(d)}`
     }),
     Plot.boxX(top_hubs, {
       y: "Hub Mapped",
@@ -221,7 +294,7 @@ const hub_boxplot = Plot.plot({
       y: "Hub Mapped",
       x: "Compensation - Annual Base Salary/Pay", 
       opacity: 0.8,
-      fill: "red",
+      fill: "blue",
       sort: {y: "x", reverse: true}
     }),
   ]
@@ -252,6 +325,62 @@ hub_boxplot
 ))
 }});
 
+define({id: "e551d7e5", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+const degree_boxplot = Plot.plot({
+  width: width,
+  height: 350,
+  x: {
+    domain: [0, 650000],
+    insetLeft: 200
+  },
+  color: {
+    legend: true,
+  },
+  marks: [
+    Plot.ruleY([0]),
+    Plot.gridY({
+      strokeDasharray: "0.75,2", // dashed
+      strokeOpacity: 1 // opaque
+    }),
+    Plot.axisY({
+      tickSize: 0,
+      dx: 10,
+      dy: -5,
+      textAnchor: "start",
+      lineAnchor: "bottom", // draw labels above grid lines
+      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
+      // tickFormat: d => `${d3.format("$,.0f")(d)}`
+    }),
+    Plot.boxX(top_hubs, {
+      y: "What degrees do you have?",
+      x: "Compensation - Annual Base Salary/Pay", 
+      color: "What degrees do you have?",
+      stroke: "#999",
+      opacity: 0.8,
+      insetTop: 5,
+      insetBottom: 5,
+      sort: {y: "x", reverse: true}
+    }),
+    Plot.boxX(top_hubs_search, {
+      y: "What degrees do you have?",
+      x: "Compensation - Annual Base Salary/Pay", 
+      opacity: 0.8,
+      fill: "#33ee33",
+      insetTop: 5,
+      insetBottom: 5,
+      sort: {y: "x", reverse: true}
+    }),
+  ]
+})
+return {degree_boxplot};
+}});
+
+define({id: "257ba2f3", mode: "inline", inputs: ["degree_boxplot","display"], body: async (degree_boxplot,display) => {
+display(await(
+degree_boxplot
+))
+}});
+
 define({id: "c66661a8", mode: "inline", inputs: ["Inputs","search_result","display"], body: async (Inputs,search_result,display) => {
 display(await(
 Inputs.table(search_result)
@@ -276,9 +405,7 @@ Inputs.table(search_result)
   <details open>
     <summary>Labor</summary>
     <ol>
-    <li class="observablehq-link"><a href="./healthcare-labor">Healthcare Labor Statistics</a></li>
     <li class="observablehq-link"><a href="./healthcare-labor-v2">Healthcare Labor Statistics V2</a></li>
-    <li class="observablehq-link"><a href="./healthcare-labor-wages">Healthcare Wages</a></li>
     <li class="observablehq-link"><a href="./occupation-search">Occupation Explorer</a></li>
     </ol>
   </details>
@@ -289,7 +416,7 @@ Inputs.table(search_result)
     </ol>
   </details>
   <details open class="observablehq-section-active">
-    <summary>Others</summary>
+    <summary>Biotech/Pharma</summary>
     <ol>
     <li class="observablehq-link observablehq-link-active"><a href="./biotech-salary">Biotech Compensation</a></li>
     </ol>
@@ -300,47 +427,55 @@ Inputs.table(search_result)
 <nav>
 <div>Contents</div>
 <ol>
-<li class="observablehq-secondary-link"><a href="#compensation">Compensation</a></li>
-<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-years-of-experience">∟ By Years of Experience</a></li>
-<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-location">∟ By Location</a></li>
-<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-industry">∟ By Industry</a></li>
-<li class="observablehq-secondary-link"><a href="#%E2%88%9F-by-title">∟ By Title</a></li>
+<li class="observablehq-secondary-link"><a href="#inputs%2Fparameters">Inputs/Parameters</a></li>
+<li class="observablehq-secondary-link"><a href="#annual-compensation">Annual Compensation</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-years-of-experience">∟ Years of Experience</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-location">∟ Location</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-industry">∟ Industry</a></li>
+<li class="observablehq-secondary-link"><a href="#%E2%88%9F-degree">∟ Degree</a></li>
 </ol>
 </nav>
 </aside>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
 <h1 id="biotech-levels" tabindex="-1"><a class="observablehq-header-anchor" href="#biotech-levels">Biotech Levels</a></h1>
-<div class="observablehq observablehq--block">
-  <div class="observablehq--inspect observablehq--error">SyntaxError: non-local file path: ../data/biotech_levels.csv (1:28)</div>
-</div>
+<div class="observablehq observablehq--block"><!--:9b176f1a:--></div>
+<div class="observablehq observablehq--block"><!--:01ba4719:--></div>
 <div class="observablehq observablehq--block"><!--:2aad0ea3:--></div>
 <div class="observablehq observablehq--block"><!--:580ff2cc:--></div>
 <div class="observablehq observablehq--block"><!--:36ab3524:--></div>
 <div class="observablehq observablehq--block"><!--:2ec65455:--></div>
-<div class="observablehq observablehq--block"><!--:54aa5a83:--></div>
-<h1 id="compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation">Compensation</a></h1>
-<p>This data is collected from</p>
-<h2 id="%E2%88%9F-by-years-of-experience" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-years-of-experience">∟ By Years of Experience</a></h2>
-<p>Search for any text (e.g. "AbbVie", "Scientist", "Director", "Boston")</p>
+<div class="observablehq observablehq--block"><!--:c00f07c7:--></div>
+<h1 id="inputs%2Fparameters" tabindex="-1"><a class="observablehq-header-anchor" href="#inputs%2Fparameters">Inputs/Parameters</a></h1>
+<p>There is a lot of ways to slice and dice this.</p>
+<p>But the easiest way is to use all-field, all-text search.</p>
 <p><observablehq-loading></observablehq-loading><!--:52c1d7cf:--></p>
-<div class="observablehq observablehq--block"><!--:16e5b87a:--></div>
-<div class="observablehq observablehq--block"><!--:9bd0cf97:--></div>
-<div class="observablehq observablehq--block"><!--:147c8ce3:--></div>
-<div class="observablehq observablehq--block"><!--:51d6693c:--></div>
+<hr>
+<h1 id="annual-compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#annual-compensation">Annual Compensation</a></h1>
+<p>This data is collected from <a href="https://www.reddit.com/r/biotech/comments/18vq4rw/rbiotech_salary_and_company_survey_2024/" target="_blank" rel="noopener noreferrer">Reddit</a> or direct link to data source <a href="https://docs.google.com/spreadsheets/d/1G0FmJhkOME_sv66hWmhnZS5qR2KMTY7nzkxksv46bfk/edit?gid=491268892#gid=491268892" target="_blank" rel="noopener noreferrer">Google Sheets</a>. You can contribute by completing this <a href="https://forms.gle/s68ExUmPVzhFAaWJ7" target="_blank" rel="noopener noreferrer">Google Forms Link</a>.</p>
+<h2 id="%E2%88%9F-years-of-experience" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-years-of-experience">∟ Years of Experience</a></h2>
+<div class="info">
+Search for any text (e.g. "AbbVie", "Scientist", "Director", "Boston")
+</div>
+<div class="observablehq observablehq--block"><!--:ceecdaf3:--></div>
+<div class="observablehq observablehq--block"><!--:a41c142d:--></div>
+<div class="observablehq observablehq--block"><!--:59112a8e:--></div>
+<div class="observablehq observablehq--block"><!--:d612707d:--></div>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:9ef9eb00:-->
 <observablehq-loading></observablehq-loading><!--:a95b3907:-->
 </div>
 <div class="observablehq observablehq--block"><!--:1d45ffef:--></div>
-<h2 id="%E2%88%9F-by-location" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-location">∟ By Location</a></h2>
+<h2 id="%E2%88%9F-location" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-location">∟ Location</a></h2>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:2b7a343f:-->
 </div>
-<h2 id="%E2%88%9F-by-industry" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-industry">∟ By Industry</a></h2>
-<p>test</p>
-<h2 id="%E2%88%9F-by-title" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-by-title">∟ By Title</a></h2>
-<p>test</p>
+<h2 id="%E2%88%9F-industry" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-industry">∟ Industry</a></h2>
+<h2 id="%E2%88%9F-degree" tabindex="-1"><a class="observablehq-header-anchor" href="#%E2%88%9F-degree">∟ Degree</a></h2>
+<div class="observablehq observablehq--block"><!--:e551d7e5:--></div>
+<div class="card" style="background: none; padding: 20px;">
+<observablehq-loading></observablehq-loading><!--:257ba2f3:-->
+</div>
 <div class="card" style="background: none; padding: 2px;">
 <observablehq-loading></observablehq-loading><!--:c66661a8:-->
 </div></main>

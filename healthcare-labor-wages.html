@@ -1,81 +1,82 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.11.0">
 <title>Wage - Healthcare Labor | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_import/occupation-search.89a370a0.css">
-<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.css">
-<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_import/occupation-search.89a370a0.css">
-<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.css">
-<link rel="modulepreload" href="./_observablehq/client.js">
-<link rel="modulepreload" href="./_observablehq/runtime.js">
-<link rel="modulepreload" href="./_observablehq/stdlib.js">
-<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/arquero@5.4.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/duckdb.js">
-<link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
-<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/_esm.js">
-<link rel="modulepreload" href="./_npm/topojson-client@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/@duckdb/duckdb-wasm@1.28.0/_esm.js">
-<link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
-<link rel="modulepreload" href="./_npm/apache-arrow@15.0.2/_esm.js">
-<link rel="modulepreload" href="./_npm/acorn@8.11.3/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-array@3.2.4/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-color@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-force@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-format@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-path@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-random@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-time@3.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/_esm.js">
-<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
-<link rel="modulepreload" href="./_npm/apache-arrow@16.1.0/_esm.js">
-<link rel="modulepreload" href="./_npm/tslib@2.6.2/_esm.js">
-<link rel="modulepreload" href="./_npm/flatbuffers@23.5.26/_esm.js">
-<link rel="modulepreload" href="./_npm/internmap@2.0.3/_esm.js">
-<link rel="modulepreload" href="./_npm/delaunator@5.0.1/_esm.js">
-<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
-<link rel="modulepreload" href="./_npm/flatbuffers@24.3.25/_esm.js">
-<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/_esm.js">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_import/occupation-search.76019f3d.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_import/occupation-search.76019f3d.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="modulepreload" href="./_observablehq/client.abea4c62.js">
+<link rel="modulepreload" href="./_observablehq/runtime.5adf6409.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.104bdab1.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/407f7a1f.js">
+<link rel="modulepreload" href="./_npm/arquero@5.4.0/3861566f.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/7055d4c5.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/duckdb.cb903867.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.3eed7a9d.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/0bada646.js">
+<link rel="modulepreload" href="./_npm/topojson-client@3.1.0/44d97fcb.js">
+<link rel="modulepreload" href="./_npm/@duckdb/duckdb-wasm@1.28.0/805f2278.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
+<link rel="modulepreload" href="./_npm/apache-arrow@15.0.2/b4922666.js">
+<link rel="modulepreload" href="./_npm/acorn@8.11.3/fc68f30e.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/e95f898e.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/d44feff9.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/5830b12a.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/84d7b8e9.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/2c0cdfa2.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/626bedc4.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/00c41b5d.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/b5f7cdc6.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/b22c5864.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/6f15f633.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/ef1ec490.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/5e1ff060.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.0/5851d7ef.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/dcd02767.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/f1db2593.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/034b7bcb.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/4bb53638.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/bbafde58.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/aa5b35a8.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/32c7fec2.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/567840a0.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/cf9b720b.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/5dcd62f4.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/f8e03c56.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/5bc129e1.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/19c92b44.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/f31b5398.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/8debb4ba.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/4b0cc581.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
+<link rel="modulepreload" href="./_npm/apache-arrow@16.1.0/2687d13f.js">
+<link rel="modulepreload" href="./_npm/tslib@2.6.2/bd111af4.js">
+<link rel="modulepreload" href="./_npm/flatbuffers@23.5.26/dfdb8450.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/5eed35fd.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.0.1/e67acb27.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
+<link rel="modulepreload" href="./_npm/flatbuffers@24.3.25/fd24637b.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/8ac9039b.js">
 <script type="module">
 
-import {define} from "./_observablehq/client.js";
-import {registerFile, FileAttachment} from "./_observablehq/stdlib.js";
-import {registerTable} from "./_observablehq/stdlib/duckdb.js";
+import {define} from "./_observablehq/client.abea4c62.js";
+import {registerFile, FileAttachment} from "./_observablehq/stdlib.104bdab1.js";
+import {registerTable} from "./_observablehq/stdlib/duckdb.cb903867.js";
 
-registerFile("./data/oes/processed/naics_lookup_from_data.csv", {"name":"./data/oes/processed/naics_lookup_from_data.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/naics_lookup_from_data.0a57814f.csv","lastModified":1720724332694});
-registerFile("./data/oes/processed/occ_code.csv", {"name":"./data/oes/processed/occ_code.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/occ_code.6848eccf.csv","lastModified":1720323702095});
-registerFile("./data/oes/processed/oes_longitudinal_slim.parquet", {"name":"./data/oes/processed/oes_longitudinal_slim.parquet","path":"./_file/data/oes/processed/oes_longitudinal_slim.30d9d5bc.parquet","lastModified":1720323702068});
-registerFile("./data/oes/processed/oes_longitudinal_wages_long.parquet", {"name":"./data/oes/processed/oes_longitudinal_wages_long.parquet","path":"./_file/data/oes/processed/oes_longitudinal_wages_long.59df99c8.parquet","lastModified":1721380054597});
-registerFile("./data/oes/processed/oews_estimates_slim.parquet", {"name":"./data/oes/processed/oews_estimates_slim.parquet","path":"./_file/data/oes/processed/oews_estimates_slim.2e1882bd.parquet","lastModified":1721473181780});
-registerFile("./data/oes/processed/oews_estimates_state_long.parquet", {"name":"./data/oes/processed/oews_estimates_state_long.parquet","path":"./_file/data/oes/processed/oews_estimates_state_long.1b7fe7a7.parquet","lastModified":1721473289869});
-registerFile("./data/oes/processed/state_lookup.csv", {"name":"./data/oes/processed/state_lookup.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/state_lookup.d5b680d9.csv","lastModified":1720723183346});
-registerFile("./dataloaders/counties-10m.json", {"name":"./dataloaders/counties-10m.json","mimeType":"application/json","path":"./_file/dataloaders/counties-10m.145aaf5d.json","lastModified":1712986955947});
+registerFile("./data/oes/processed/naics_lookup_from_data.csv", {"name":"./data/oes/processed/naics_lookup_from_data.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/naics_lookup_from_data.0a57814f.csv","lastModified":1720724332694,"size":26595});
+registerFile("./data/oes/processed/occ_code.csv", {"name":"./data/oes/processed/occ_code.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/occ_code.6848eccf.csv","lastModified":1720323702095,"size":72506});
+registerFile("./data/oes/processed/oes_longitudinal_slim.parquet", {"name":"./data/oes/processed/oes_longitudinal_slim.parquet","path":"./_file/data/oes/processed/oes_longitudinal_slim.30d9d5bc.parquet","lastModified":1720323702068,"size":6400626});
+registerFile("./data/oes/processed/oes_longitudinal_wages_long.parquet", {"name":"./data/oes/processed/oes_longitudinal_wages_long.parquet","path":"./_file/data/oes/processed/oes_longitudinal_wages_long.59df99c8.parquet","lastModified":1721380054597,"size":23234584});
+registerFile("./data/oes/processed/oews_estimates_slim.parquet", {"name":"./data/oes/processed/oews_estimates_slim.parquet","path":"./_file/data/oes/processed/oews_estimates_slim.2e1882bd.parquet","lastModified":1721473181780,"size":17905688});
+registerFile("./data/oes/processed/oews_estimates_state_long.parquet", {"name":"./data/oes/processed/oews_estimates_state_long.parquet","path":"./_file/data/oes/processed/oews_estimates_state_long.1b7fe7a7.parquet","lastModified":1721473289869,"size":17221664});
+registerFile("./data/oes/processed/state_lookup.csv", {"name":"./data/oes/processed/state_lookup.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/state_lookup.d5b680d9.csv","lastModified":1720723183346,"size":703});
+registerFile("./dataloaders/counties-10m.json", {"name":"./dataloaders/counties-10m.json","mimeType":"application/json","path":"./_file/dataloaders/counties-10m.145aaf5d.json","lastModified":1712986955947,"size":842143});
 registerTable("oes_db", FileAttachment("./data/oes/processed/oes_longitudinal_slim.parquet"));
 registerTable("oews_estimates", FileAttachment("./data/oes/processed/oews_estimates_slim.parquet"));
 registerTable("oes_wages", FileAttachment("./data/oes/processed/oes_longitudinal_wages_long.parquet"));
@@ -1115,8 +1116,8 @@ Inputs.table(
 <nav>
 <div>Contents</div>
 <ol>
-<li class="observablehq-secondary-link"><a href="#national-level%3A-wages">National-level: Wages</a></li>
-<li class="observablehq-secondary-link"><a href="#state-level%3A-wages">State-level: Wages</a></li>
+<li class="observablehq-secondary-link"><a href="#national-level-wages">National-level: Wages</a></li>
+<li class="observablehq-secondary-link"><a href="#state-level-wages">State-level: Wages</a></li>
 <li class="observablehq-secondary-link"><a href="#references">References</a></li>
 <li class="observablehq-secondary-link"><a href="#feedback">Feedback</a></li>
 </ol>
@@ -1124,7 +1125,7 @@ Inputs.table(
 </aside>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
-<h1 id="wage%3A-healthcare-labor" tabindex="-1"><a class="observablehq-header-anchor" href="#wage%3A-healthcare-labor">Wage: Healthcare Labor</a></h1>
+<h1 id="wage-healthcare-labor" tabindex="-1"><a class="observablehq-header-anchor" href="#wage-healthcare-labor">Wage: Healthcare Labor</a></h1>
 <!-- Preload lookup files-->
 <hr style="padding: 0">
 <div class="observablehq observablehq--block"><!--:ba6a16f1:--></div>
@@ -1151,7 +1152,7 @@ Inputs.table(
 <observablehq-loading></observablehq-loading><!--:2bbffbab:-->
 </div>
 <hr style="padding: 0">
-<h2 id="national-level%3A-wages" tabindex="-1"><a class="observablehq-header-anchor" href="#national-level%3A-wages">National-level: Wages</a></h2>
+<h2 id="national-level-wages" tabindex="-1"><a class="observablehq-header-anchor" href="#national-level-wages">National-level: Wages</a></h2>
 <div class="occupation-card occupation-card-container" style="padding: 0; overflow:hidden;">
   <div class="occupation-card occupation-card-small" style="max-width: 100%; border: 0px; border-right: 1px solid #eee; border-radius: 0;">
     <h1 style="border-bottom: 3px solid red;
@@ -1164,7 +1165,7 @@ Inputs.table(
   <!-- <div class="occupation-card occupation-card-small">
   </div> -->
 </div>
-<h2 id="state-level%3A-wages" tabindex="-1"><a class="observablehq-header-anchor" href="#state-level%3A-wages">State-level: Wages</a></h2>
+<h2 id="state-level-wages" tabindex="-1"><a class="observablehq-header-anchor" href="#state-level-wages">State-level: Wages</a></h2>
 <div class="occupation-card occupation-card-container" style="padding: 0; overflow:hidden;">
   <div class="occupation-card occupation-card-small" style="max-width: 100%; border: 0px; border-right: 1px solid #eee; border-radius: 0;">
     <h1 style="border-bottom: 3px solid red;

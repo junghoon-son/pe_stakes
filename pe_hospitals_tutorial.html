@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.11.0">
 <title>Tutorial: PE Hospitals Tracker | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_observablehq/theme-air.css">
-<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.css">
-<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.css">
-<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.css">
-<link rel="modulepreload" href="./_observablehq/client.js">
-<link rel="modulepreload" href="./_observablehq/runtime.js">
-<link rel="modulepreload" href="./_observablehq/stdlib.js">
-<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
-<link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
-<link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air.9914ee1a.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.9914ee1a.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="modulepreload" href="./_observablehq/client.abea4c62.js">
+<link rel="modulepreload" href="./_observablehq/runtime.5adf6409.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.104bdab1.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/407f7a1f.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.3eed7a9d.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
 <script type="module">
 
-import {define} from "./_observablehq/client.js";
-import {registerFile} from "./_observablehq/stdlib.js";
+import {define} from "./_observablehq/client.abea4c62.js";
+import {registerFile} from "./_observablehq/stdlib.104bdab1.js";
 
-registerFile("./dataloaders/pe-hospital-tracker.csv", {"name":"./dataloaders/pe-hospital-tracker.csv","mimeType":"text/csv","path":"./_file/dataloaders/pe-hospital-tracker.848d3d00.csv","lastModified":1712659086538});
+registerFile("./dataloaders/pe-hospital-tracker.csv", {"name":"./dataloaders/pe-hospital-tracker.csv","mimeType":"text/csv","path":"./_file/dataloaders/pe-hospital-tracker.848d3d00.csv","lastModified":1712659086538,"size":1252630});
 
 define({id: "e0ad8bd7", inputs: ["FileAttachment"], outputs: ["pe_hospitals"], body: (FileAttachment) => {
 const pe_hospitals = FileAttachment("./dataloaders/pe-hospital-tracker.csv").csv({typed: true})
@@ -146,21 +147,21 @@ pe_hospital_table
 <div>Contents</div>
 <ol>
 <li class="observablehq-secondary-link"><a href="#1-dataloaders-basics">1 Dataloaders Basics</a></li>
-<li class="observablehq-secondary-link"><a href="#1.1-write-your-dataloader">1.1 Write your dataloader</a></li>
-<li class="observablehq-secondary-link"><a href="#1.2-load-the-dataloader">1.2 Load the dataloader</a></li>
-<li class="observablehq-secondary-link"><a href="#1.3-input-selector">1.3 Input selector</a></li>
-<li class="observablehq-secondary-link"><a href="#1.4%3A-interactive-table">1.4: Interactive Table</a></li>
+<li class="observablehq-secondary-link"><a href="#1-1-write-your-dataloader">1.1 Write your dataloader</a></li>
+<li class="observablehq-secondary-link"><a href="#1-2-load-the-dataloader">1.2 Load the dataloader</a></li>
+<li class="observablehq-secondary-link"><a href="#1-3-input-selector">1.3 Input selector</a></li>
+<li class="observablehq-secondary-link"><a href="#1-4-interactive-table">1.4: Interactive Table</a></li>
 </ol>
 </nav>
 </aside>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
-<h1 id="tutorial%3A-pe-hospitals-tracker" tabindex="-1"><a class="observablehq-header-anchor" href="#tutorial%3A-pe-hospitals-tracker">Tutorial: PE Hospitals Tracker</a></h1>
+<h1 id="tutorial-pe-hospitals-tracker" tabindex="-1"><a class="observablehq-header-anchor" href="#tutorial-pe-hospitals-tracker">Tutorial: PE Hospitals Tracker</a></h1>
 <hr>
 <h1 id="1-dataloaders-basics" tabindex="-1"><a class="observablehq-header-anchor" href="#1-dataloaders-basics">1 Dataloaders Basics</a></h1>
 <p>Note that <code>Observable</code> likes to show the result output of the code first, followed by source code.</p>
 <hr>
-<h2 id="1.1-write-your-dataloader" tabindex="-1"><a class="observablehq-header-anchor" href="#1.1-write-your-dataloader">1.1 Write your dataloader</a></h2>
+<h2 id="1-1-write-your-dataloader" tabindex="-1"><a class="observablehq-header-anchor" href="#1-1-write-your-dataloader">1.1 Write your dataloader</a></h2>
 <p>Data loaders is one of the most intriguing pieces of Observable Framework. It allows users to write, in any of the language supported (R, Python, shell script).</p>
 <p>The dataloader code for this project is located in <strong><code>dataloaders/pe-hospital-tracker.csv.py</code></strong> . I personally use Polars as my main data transformation.</p>
 <p>After examining the file, I found the data useful for but I need some sort of geospatial information. Two options:</p>
@@ -189,7 +190,7 @@ df.write_csv(sys.stdout)
 <div class="note">The magic of data loaders is that even though the file is a python file (**`.py`**), the data loader framework allows you to read this as if it's a CSV. 
 </div>
 <hr>
-<h2 id="1.2-load-the-dataloader" tabindex="-1"><a class="observablehq-header-anchor" href="#1.2-load-the-dataloader">1.2 Load the dataloader</a></h2>
+<h2 id="1-2-load-the-dataloader" tabindex="-1"><a class="observablehq-header-anchor" href="#1-2-load-the-dataloader">1.2 Load the dataloader</a></h2>
 <p><code>FileAttachment()</code> can read either actual file or the dataloader-based file name re-routing (without the <code>.py</code> extension), as if you are loading a CSV file. Despite</p>
 <div class="observablehq observablehq--block"><!--:e0ad8bd7:--></div>
 <pre data-language="js"><code class="language-js"><span class="hljs-keyword">const</span> pe_hospitals = <span class="hljs-title class_">FileAttachment</span>(<span class="hljs-string">"dataloaders/pe-hospital-tracker.csv"</span>).<span class="hljs-title function_">csv</span>({<span class="hljs-attr">typed</span>: <span class="hljs-literal">true</span>})
@@ -198,7 +199,7 @@ df.write_csv(sys.stdout)
 <pre data-language="js"><code class="language-js">pe_hospitals
 </code></pre>
 <hr>
-<h2 id="1.3-input-selector" tabindex="-1"><a class="observablehq-header-anchor" href="#1.3-input-selector">1.3 Input selector</a></h2>
+<h2 id="1-3-input-selector" tabindex="-1"><a class="observablehq-header-anchor" href="#1-3-input-selector">1.3 Input selector</a></h2>
 <p>Select unique values of <strong><code>PE Firm</code></strong> from the <strong><code>pe_hospitals</code></strong> Array object. These are private equity firms.</p>
 <div class="observablehq observablehq--block"><!--:f549d640:--></div>
 <pre data-language="js"><code class="language-js"><span class="hljs-keyword">const</span> pe_options = (
@@ -207,7 +208,7 @@ df.write_csv(sys.stdout)
   .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">d</span>) =&gt;</span> d[<span class="hljs-string">'PE Firm'</span>])
 )
 </code></pre>
-<h4 id="pe_options" tabindex="-1"><a class="observablehq-header-anchor" href="#pe_options"><code>pe_options</code></a></h4>
+<h4 id="pe-options" tabindex="-1"><a class="observablehq-header-anchor" href="#pe-options"><code>pe_options</code></a></h4>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:41d330fb:--></div>
 <hr>
 <p>Then display it using <strong><code>Input.select()</code></strong> with options to make it multi-selectable with 10 rows displayed.</p>
@@ -238,7 +239,7 @@ df.write_csv(sys.stdout)
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:c33dd523:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:e740f788:--></div>
 <hr>
-<h2 id="1.4%3A-interactive-table" tabindex="-1"><a class="observablehq-header-anchor" href="#1.4%3A-interactive-table">1.4: Interactive Table</a></h2>
+<h2 id="1-4-interactive-table" tabindex="-1"><a class="observablehq-header-anchor" href="#1-4-interactive-table">1.4: Interactive Table</a></h2>
 <p>Using the selected names of the PEs, we can filter the JavaScript Array of <strong><code>pe_hospitals</code></strong>. I this the syntax will be unusual for python users but for people who've dabbled in JavaScript, the <strong><code>filter()</code></strong> and the hash rocket (=&gt;) syntax translated as python/pandas will very similar to:</p>
 <ul>
 <li>Python/pandas: <strong><code>df.apply(lambda row: selected_pe_names in row['PE Firm'])</code></strong></li>
@@ -261,7 +262,7 @@ df.write_csv(sys.stdout)
 <span class="hljs-comment">// Assign the selected choices as an Array</span>
 <span class="hljs-keyword">const</span> pe_hospitals_selected = <span class="hljs-title class_">Generators</span>.<span class="hljs-title function_">input</span>(pe_hospital_table)
 </code></pre>
-<h3 id="output-pe_hospital_table" tabindex="-1"><a class="observablehq-header-anchor" href="#output-pe_hospital_table">Output <code>pe_hospital_table</code></a></h3>
+<h3 id="output-pe-hospital-table" tabindex="-1"><a class="observablehq-header-anchor" href="#output-pe-hospital-table">Output <code>pe_hospital_table</code></a></h3>
 <p><observablehq-loading></observablehq-loading><!--:6335e62c:--></p>
 </main>
 <footer id="observablehq-footer">

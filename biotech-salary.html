@@ -409,10 +409,10 @@ const degree_counts = search_result_aq.groupby("What degrees do you have?").roll
 return {degree_counts};
 }});
 
-define({id: "54b2f345", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
+define({id: "1e2abadc", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
-  subtitle: "Median Annual Compensation ($)",
+  subtitle: "Median Annual Compensation ($) displayed in green",
   width: width,
   height: 300,
   x: {
@@ -431,6 +431,10 @@ const degree_boxplot = Plot.plot({
       strokeDasharray: "0.75,2", // dashed
       strokeOpacity: 1 // opaque
     }),
+    Plot.gridX({
+      strokeDasharray: "0.75,2", // dashed
+      strokeOpacity: 1 // opaque
+    }),
     Plot.axisY({
       tickSize: 0,
       dx: 10,
@@ -445,18 +449,20 @@ const degree_boxplot = Plot.plot({
       x: "Compensation - Annual Base Salary/Pay", 
       color: "What degrees do you have?",
       stroke: "#999",
+      dy: -18,
       opacity: 0.8,
-      insetTop: 4,
-      insetBottom: 4,
+      insetTop: 7,
+      insetBottom: 8,
       sort: {y: "x", reverse: true}
     }),
     Plot.boxX(top_hubs_search, {
       y: "What degrees do you have?",
       x: "Compensation - Annual Base Salary/Pay", 
-      opacity: 0.8,
+      // opacity: 0.8,
+      dy: -18,
       fill: "#118811",
-      insetTop: 4,
-      insetBottom: 4,
+      insetTop: 7,
+      insetBottom: 8,
       sort: {y: "x", reverse: true}
     }),
     Plot.text(top_hubs_search, {
@@ -572,7 +578,7 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:54b2f345:--></div>
+<div class="observablehq observablehq--block"><!--:1e2abadc:--></div>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

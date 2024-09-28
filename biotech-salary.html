@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="generator" content="Observable Framework v1.11.0">
-<title>Biotech Salaries | Clinicians.fyi</title>
+<title>Biotech Compensation | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
 <link rel="preload" as="style" href="./_observablehq/theme-air,wide.585057a9.css">
@@ -409,14 +409,14 @@ const degree_counts = search_result_aq.groupby("What degrees do you have?").roll
 return {degree_counts};
 }});
 
-define({id: "1e2abadc", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
+define({id: "96df5939", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
   subtitle: "Median Annual Compensation ($) displayed in green",
   width: width,
   height: 300,
   x: {
-    domain: [0, 650000],
+    domain: [0, 500000],
     insetLeft: 200
   },
   y: {
@@ -537,7 +537,7 @@ return {degree_boxplot};
 </aside>
 <div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
-<h1 id="biotech-salaries" tabindex="-1"><a class="observablehq-header-anchor" href="#biotech-salaries">Biotech Salaries</a></h1>
+<h1 id="biotech-compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#biotech-compensation">Biotech Compensation</a></h1>
 <div class="observablehq observablehq--block"><!--:9b176f1a:--></div>
 <div class="observablehq observablehq--block"><!--:2aad0ea3:--></div>
 <div class="observablehq observablehq--block"><!--:580ff2cc:--></div>
@@ -578,7 +578,7 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:1e2abadc:--></div>
+<div class="observablehq observablehq--block"><!--:96df5939:--></div>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

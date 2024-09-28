@@ -95,7 +95,11 @@ const GLOBAL_HEIGHT = 350;
 return {GLOBAL_HEIGHT};
 }});
 
-define({id: "1f41bf31", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
+define({id: "01ba4719", body: () => {
+
+}});
+
+define({id: "0d703ab4", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
 const main_fig = Plot.plot({
   title: "Annual Compensation vs. Years of Experience",
   width: width,
@@ -137,14 +141,10 @@ const main_fig = Plot.plot({
       y: "Compensation - Annual Base Salary/Pay", 
       channels: {
         "Institution": "Company or Institution Name",
-        "Position": "[Optional] Briefly describe your position",
-        "Annual Pay": "Compensation - Annual Base Salary/Pay"
       },
       // opacity: 0.2,
       stroke: "gray",
       tip: {
-        "Annual Pay": true,
-        "Position": true,
         "Compensation - Annual Base Salary/Pay": false,
         "x": false,
         lineWidth: 300,
@@ -159,8 +159,8 @@ const main_fig = Plot.plot({
       y: "Compensation - Annual Base Salary/Pay", 
       fill: "#eeffff",
       stroke: "red",
-      opacity: 0.6,
-      r: 5,
+      // opacity: 0.6,
+      r: 4,
     }),
     Plot.linearRegressionY(biotech_levels_data, {
       x: "Years of Experience", 
@@ -382,7 +382,33 @@ const industry_boxplot = Plot.plot({
 return {industry_boxplot};
 }});
 
-define({id: "d4ef737b", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "4badf542", mode: "inline", inputs: ["industry_boxplot","display"], body: async (industry_boxplot,display) => {
+display(await(
+industry_boxplot
+))
+}});
+
+define({id: "12d8926f", inputs: ["search_result_aq","aq"], outputs: ["degree_counts"], body: (search_result_aq,aq) => {
+const degree_counts = search_result_aq.groupby("What degrees do you have?").rollup(
+  {
+    count: aq.op.count(),
+    median: aq.op.median("Compensation - Annual Base Salary/Pay"),
+    mean: aq.op.mean("Compensation - Annual Base Salary/Pay")
+  }
+)
+  .filter(
+    d => d.count > 25
+  ).objects()
+return {degree_counts};
+}});
+
+define({id: "23b36a02", inputs: ["degree_counts","display"], body: async (degree_counts,display) => {
+display(await(
+degree_counts
+))
+}});
+
+define({id: "32e0bb7d", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
   subtitle: "",
@@ -429,6 +455,20 @@ const degree_boxplot = Plot.plot({
       insetBottom: 5,
       sort: {y: "x", reverse: true}
     }),
+    Plot.text(top_hubs_search, {
+      x: d => degree_counts.filter(e => e['What degrees do you have?'] == d['What degrees do you have?']).map(e => parseInt(e['median'])),
+      // px: d => degree_counts.filter(e => e['What degrees do you have?'] == d).map(e => parseInt(e['median'])),
+      y: "What degrees do you have?", 
+      // dy: -20, 
+      // dx: 250,
+      // frameAnchor: "top-left", 
+      // textAnchor: "end",
+      // monospace: true,
+      fontWeight: 100,
+      // fontSize: 20,
+      // text: d => degree_counts.filter(e => e['What degrees do you have?'] == d).map(e => parseInt(e['median'])),
+      }
+    ),
   ]
 })
 return {degree_boxplot};
@@ -438,24 +478,6 @@ define({id: "257ba2f3", mode: "inline", inputs: ["degree_boxplot","display"], bo
 display(await(
 degree_boxplot
 ))
-}});
-
-define({id: "2ac559af", inputs: ["search_result_aq","aq"], outputs: ["degree_counts"], body: (search_result_aq,aq) => {
-const degree_counts = search_result_aq.groupby("What degrees do you have?").rollup(
-  {
-    count: aq.op.count(),
-    median: aq.op.median("Compensation - Annual Base Salary/Pay"),
-    mean: aq.op.mean("Compensation - Annual Base Salary/Pay")
-  }
-)
-  .filter(
-    d => d.count > 25
-  )
-return {degree_counts};
-}});
-
-define({id: "e3b0c442", body: () => {
-
 }});
 
 </script>
@@ -514,7 +536,8 @@ define({id: "e3b0c442", body: () => {
 <div class="observablehq observablehq--block"><!--:580ff2cc:--></div>
 <div class="observablehq observablehq--block"><!--:adfff054:--></div>
 <div class="observablehq observablehq--block"><!--:2ec65455:--></div>
-<div class="observablehq observablehq--block"><!--:1f41bf31:--></div>
+<div class="observablehq observablehq--block"><!--:01ba4719:--></div>
+<div class="observablehq observablehq--block"><!--:0d703ab4:--></div>
 <hr>
 <h1 id="inputs-parameters" tabindex="-1"><a class="observablehq-header-anchor" href="#inputs-parameters">Inputs/Parameters</a></h1>
 <div class="tip" label="" style="padding-top:0.1em">
@@ -540,17 +563,16 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 </div>
 <!-- ## ∟ Industry -->
 <div class="observablehq observablehq--block"><!--:dab424ec:--></div>
-<!-- 
 <div class="card" style="background: none; padding: 20px;">
-${industry_boxplot}
-</div> -->
+<observablehq-loading></observablehq-loading><!--:4badf542:-->
+</div>
 <h2 id="degree" tabindex="-1"><a class="observablehq-header-anchor" href="#degree">∟ Degree</a></h2>
-<div class="observablehq observablehq--block"><!--:d4ef737b:--></div>
+<div class="observablehq observablehq--block"><!--:12d8926f:--></div>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:23b36a02:--></div>
+<div class="observablehq observablehq--block"><!--:32e0bb7d:--></div>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:257ba2f3:-->
 </div>
-<div class="observablehq observablehq--block"><!--:2ac559af:--></div>
-<div class="observablehq observablehq--block"><!--:e3b0c442:--></div>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

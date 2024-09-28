@@ -269,7 +269,7 @@ const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null).filter(
 return {top_hubs_search};
 }});
 
-define({id: "6f017610", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "2663716d", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
 const hub_boxplot = Plot.plot({
   title: "Annual Compensation by Major U.S. Hubs",
   subtitle: "Filtered by minimum 5 records",
@@ -277,7 +277,10 @@ const hub_boxplot = Plot.plot({
   height: 700,
   x: {
     domain: [0, 650000],
-    insetLeft: 200
+    insetLeft: 150
+  },
+  y: {
+    label: null,
   },
   marks: [
     Plot.ruleY([0]),
@@ -285,6 +288,10 @@ const hub_boxplot = Plot.plot({
     Plot.gridY({
       strokeDasharray: "0.75,2", // dashed
       strokeOpacity: 1 // opaque
+    }),
+    Plot.axisX({
+      // interval: 1,
+      // marginTop: 50, 
     }),
     Plot.axisY({
       tickSize: 0,
@@ -409,38 +416,46 @@ const degree_counts = search_result_aq.groupby("What degrees do you have?").roll
 return {degree_counts};
 }});
 
-define({id: "96df5939", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
+define({id: "fa777ff7", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
-  subtitle: "Median Annual Compensation ($) displayed in green",
+  subtitle: "Median Annual Compensation ($) displayed in green.",
   width: width,
   height: 300,
+  marginLeft: 10,
+  marginRight: 50,
+  paddingLeft: 10,
+  paddingRight: 10,
   x: {
-    domain: [0, 500000],
-    insetLeft: 200
+    domain: [0, 650000],
+    insetLeft: 120,
+    insetRight: 50,
   },
   y: {
-    grid: true
+    grid: true,
+    label: null
   },
   color: {
     legend: true,
   },
   marks: [
-    Plot.ruleX([0], {stroke: "gray", strokeOpacity: 0.4}),
+    // Plot.ruleX([0], {stroke: "gray", strokeOpacity: 0.4}),
     Plot.gridY({
       strokeDasharray: "0.75,2", // dashed
       strokeOpacity: 1 // opaque
     }),
     Plot.gridX({
-      strokeDasharray: "0.75,2", // dashed
+      strokeDasharray: "0.1,1 ", // dashed
       strokeOpacity: 1 // opaque
     }),
     Plot.axisY({
       tickSize: 0,
-      dx: 10,
-      dy: -3,
-      textAnchor: "start",
-      lineAnchor: "bottom", // draw labels above grid lines
+      x: 0,
+      dx: -130,
+      dy: -8,
+      anchor: "right", 
+      // textAnchor: "right",
+      // lineAnchor: "top", // draw labels above grid lines
       // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
       // tickFormat: d => `${d3.format("$,.0f")(d)}`
     }),
@@ -452,7 +467,7 @@ const degree_boxplot = Plot.plot({
       dy: -18,
       opacity: 0.8,
       insetTop: 7,
-      insetBottom: 8,
+      insetBottom: 7,
       sort: {y: "x", reverse: true}
     }),
     Plot.boxX(top_hubs_search, {
@@ -462,13 +477,12 @@ const degree_boxplot = Plot.plot({
       dy: -18,
       fill: "#118811",
       insetTop: 7,
-      insetBottom: 8,
+      insetBottom: 7,
       sort: {y: "x", reverse: true}
     }),
     Plot.text(top_hubs_search, {
       y: "What degrees do you have?", 
       dy: -21,
-      // dx: 170,
       frameAnchor: "left", 
       textAnchor: "start",
       monospace: true,  
@@ -562,7 +576,7 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <div class="observablehq observablehq--block"><!--:62832552:--></div>
 <div class="observablehq observablehq--block"><!--:a41c142d:--></div>
 <div class="observablehq observablehq--block"><!--:59112a8e:--></div>
-<div class="observablehq observablehq--block"><!--:6f017610:--></div>
+<div class="observablehq observablehq--block"><!--:2663716d:--></div>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:9ef9eb00:-->
 <observablehq-loading></observablehq-loading><!--:a95b3907:-->
@@ -578,7 +592,7 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:96df5939:--></div>
+<div class="observablehq observablehq--block"><!--:fa777ff7:--></div>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

@@ -99,8 +99,8 @@ define({id: "01ba4719", body: () => {
 
 }});
 
-define({id: "0d703ab4", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["main_fig"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
-const main_fig = Plot.plot({
+define({id: "8075c65e", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["comp_scatter"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
+const comp_scatter = Plot.plot({
   title: "Annual Compensation vs. Years of Experience",
   width: width,
   height: GLOBAL_HEIGHT,
@@ -201,7 +201,7 @@ const main_fig = Plot.plot({
     )),
   ]
 })
-return {main_fig};
+return {comp_scatter};
 }});
 
 define({id: "52c1d7cf", mode: "inline", inputs: ["search_input","display"], body: async (search_input,display) => {
@@ -269,14 +269,14 @@ const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null).filter(
 return {top_hubs_search};
 }});
 
-define({id: "2663716d", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "0bd4952b", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
 const hub_boxplot = Plot.plot({
   title: "Annual Compensation by Major U.S. Hubs",
   subtitle: "Filtered by minimum 5 records",
   width: width,
-  height: 700,
+  // height: 700,
   x: {
-    domain: [0, 650000],
+    domain: [0, 450000],
     insetLeft: 150
   },
   y: {
@@ -292,7 +292,7 @@ const hub_boxplot = Plot.plot({
     Plot.axisX({
       // interval: 1,
       // marginTop: 50, 
-    }),
+    }), 
     Plot.axisY({
       tickSize: 0,
       dx: 10,
@@ -320,9 +320,9 @@ const hub_boxplot = Plot.plot({
 return {hub_boxplot};
 }});
 
-define({id: "9ef9eb00", mode: "inline", inputs: ["main_fig","display"], body: async (main_fig,display) => {
+define({id: "7f972c88", mode: "inline", inputs: ["comp_scatter","display"], body: async (comp_scatter,display) => {
 display(await(
-main_fig
+comp_scatter
 ))
 }});
 
@@ -343,14 +343,14 @@ hub_boxplot
 ))
 }});
 
-define({id: "dab424ec", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["industry_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "fecf974e", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["industry_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
 const industry_boxplot = Plot.plot({
   title: "Annual Compensation by Industry",
   subtitle: "This one needs work",
   width: width,
   // height: 350,
   x: {
-    domain: [0, 650000],
+    domain: [0, 500000],
     insetLeft: 200
   },
   color: {
@@ -416,18 +416,18 @@ const degree_counts = search_result_aq.groupby("What degrees do you have?").roll
 return {degree_counts};
 }});
 
-define({id: "fa777ff7", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
+define({id: "8dbdf1dc", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
   subtitle: "Median Annual Compensation ($) displayed in green.",
   width: width,
-  height: 300,
+  height: 280,
   marginLeft: 10,
   marginRight: 50,
   paddingLeft: 10,
   paddingRight: 10,
   x: {
-    domain: [0, 650000],
+    domain: [0, 400000],
     insetLeft: 120,
     insetRight: 50,
   },
@@ -541,8 +541,7 @@ return {degree_boxplot};
 <nav>
 <div>Contents</div>
 <ol>
-<li class="observablehq-secondary-link"><a href="#inputs-parameters">Inputs/Parameters</a></li>
-<li class="observablehq-secondary-link"><a href="#annual-compensation">Annual Compensation</a></li>
+<li class="observablehq-secondary-link"><a href="#search-filter">Search Filter</a></li>
 <li class="observablehq-secondary-link"><a href="#degree">∟ Degree</a></li>
 <li class="observablehq-secondary-link"><a href="#years-of-experience">∟ Years of Experience</a></li>
 <li class="observablehq-secondary-link"><a href="#location">∟ Location</a></li>
@@ -558,16 +557,14 @@ return {degree_boxplot};
 <div class="observablehq observablehq--block"><!--:adfff054:--></div>
 <div class="observablehq observablehq--block"><!--:2ec65455:--></div>
 <div class="observablehq observablehq--block"><!--:01ba4719:--></div>
-<div class="observablehq observablehq--block"><!--:0d703ab4:--></div>
+<div class="observablehq observablehq--block"><!--:8075c65e:--></div>
+<p>This data is sourced from <a href="https://www.reddit.com/r/biotech/comments/18vq4rw/rbiotech_salary_and_company_survey_2024/" target="_blank" rel="noopener noreferrer">Reddit's Biotech Compensation</a> survey. Direct link to data source: <a href="https://docs.google.com/spreadsheets/d/1G0FmJhkOME_sv66hWmhnZS5qR2KMTY7nzkxksv46bfk/edit?gid=491268892#gid=491268892" target="_blank" rel="noopener noreferrer">Google Sheets</a>. You can contribute by <a href="https://forms.gle/s68ExUmPVzhFAaWJ7" target="_blank" rel="noopener noreferrer">Google Forms Link</a>.</p>
 <hr>
-<h1 id="inputs-parameters" tabindex="-1"><a class="observablehq-header-anchor" href="#inputs-parameters">Inputs/Parameters</a></h1>
-<div class="tip" label="" style="padding-top:0.1em">
-Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
+<h1 id="search-filter" tabindex="-1"><a class="observablehq-header-anchor" href="#search-filter">Search Filter</a></h1>
+<div class="tip" label="" style="padding-top:0.1em;">
+<p>Search for any text (e.g. <code>"Pfizer"</code>, <code>"Scientist"</code>, <code>"Director"</code>, <code>"Boston"</code>)</p>
 <p><observablehq-loading></observablehq-loading><!--:52c1d7cf:--></p>
 </div>
-<hr>
-<h1 id="annual-compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#annual-compensation">Annual Compensation</a></h1>
-<p>This data is collected from <a href="https://www.reddit.com/r/biotech/comments/18vq4rw/rbiotech_salary_and_company_survey_2024/" target="_blank" rel="noopener noreferrer">Reddit</a> or direct link to data source <a href="https://docs.google.com/spreadsheets/d/1G0FmJhkOME_sv66hWmhnZS5qR2KMTY7nzkxksv46bfk/edit?gid=491268892#gid=491268892" target="_blank" rel="noopener noreferrer">Google Sheets</a>. You can contribute by completing this <a href="https://forms.gle/s68ExUmPVzhFAaWJ7" target="_blank" rel="noopener noreferrer">Google Forms Link</a>.</p>
 <h2 id="degree" tabindex="-1"><a class="observablehq-header-anchor" href="#degree">∟ Degree</a></h2>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:257ba2f3:-->
@@ -576,9 +573,9 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <div class="observablehq observablehq--block"><!--:62832552:--></div>
 <div class="observablehq observablehq--block"><!--:a41c142d:--></div>
 <div class="observablehq observablehq--block"><!--:59112a8e:--></div>
-<div class="observablehq observablehq--block"><!--:2663716d:--></div>
+<div class="observablehq observablehq--block"><!--:0bd4952b:--></div>
 <div class="card" style="background: none; padding: 20px;">
-<observablehq-loading></observablehq-loading><!--:9ef9eb00:-->
+<observablehq-loading></observablehq-loading><!--:7f972c88:-->
 <observablehq-loading></observablehq-loading><!--:a95b3907:-->
 </div>
 <div class="observablehq observablehq--block"><!--:1d45ffef:--></div>
@@ -587,12 +584,13 @@ Search for any text (e.g. `Pfizer`, `Scientist`, `Director`, `Boston`)
 <observablehq-loading></observablehq-loading><!--:2b7a343f:-->
 </div>
 <!-- ## ∟ Industry -->
-<div class="observablehq observablehq--block"><!--:dab424ec:--></div>
+<div class="observablehq observablehq--block"><!--:fecf974e:--></div>
 <div class="card" style="background: none; padding: 20px;">
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:fa777ff7:--></div>
+<div class="observablehq observablehq--block"><!--:8dbdf1dc:--></div>
+<h3 id="chart-code" tabindex="-1"><a class="observablehq-header-anchor" href="#chart-code">Chart Code</a></h3>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

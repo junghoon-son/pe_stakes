@@ -416,7 +416,7 @@ const degree_counts = search_result_aq.groupby("What degrees do you have?").roll
 return {degree_counts};
 }});
 
-define({id: "8dbdf1dc", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
+define({id: "37b048ad", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
 const degree_boxplot = Plot.plot({
   title: "Annual Compensation by Highest Degree",
   subtitle: "Median Annual Compensation ($) displayed in green.",
@@ -589,7 +589,7 @@ return {degree_boxplot};
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:8dbdf1dc:--></div>
+<div class="observablehq observablehq--block"><!--:37b048ad:--></div>
 <h3 id="chart-code" tabindex="-1"><a class="observablehq-header-anchor" href="#chart-code">Chart Code</a></h3>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}

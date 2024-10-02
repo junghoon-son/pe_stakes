@@ -64,7 +64,7 @@ import {define} from "./_observablehq/client.abea4c62.js";
 import {registerFile, FileAttachment} from "./_observablehq/stdlib.104bdab1.js";
 import {registerTable} from "./_observablehq/stdlib/duckdb.cb903867.js";
 
-registerFile("./data/biotech_levels.csv", {"name":"./data/biotech_levels.csv","mimeType":"text/csv","path":"./_file/data/biotech_levels.e1c18d5b.csv","lastModified":1727445672396,"size":804402});
+registerFile("./data/biotech_levels.csv", {"name":"./data/biotech_levels.csv","mimeType":"text/csv","path":"./_file/data/biotech_levels.81158144.csv","lastModified":1727840602373,"size":817130});
 registerTable("biotech_levels", FileAttachment("./data/biotech_levels.csv"));
 
 define({id: "9b176f1a", inputs: ["FileAttachment"], outputs: ["biotech_levels_data"], body: (FileAttachment) => {
@@ -501,6 +501,45 @@ const degree_boxplot = Plot.plot({
 return {degree_boxplot};
 }});
 
+define({id: "50aa4a8e", inputs: ["aq","biotech_levels_data"], outputs: ["levels_daily_count_aq"], body: (aq,biotech_levels_data) => {
+const levels_daily_count_aq =  aq.from(biotech_levels_data)
+  .groupby("Timestamp")
+  .rollup({
+    count: aq.op.count()
+  })
+  .objects()
+return {levels_daily_count_aq};
+}});
+
+define({id: "ff066a66", body: () => {
+// levels_daily_count_aq 
+}});
+
+define({id: "5c9b9acb", body: () => {
+// const timeline_plot = Plot.plot({
+//   x: {
+//     ticks: d3.ticks(...d3.extent(levels_daily_count_aq, (d) => d.Timestamp), 1),
+//     // tickFormat: "d",
+//     interval: 1, // recommended in case of missing data
+//     label: null
+//   },
+//   color: {
+//     scheme: "BuRd"
+//   },
+//   marks: [
+//     Plot.cell(levels_daily_count_aq, {x: "Timestamp", fill: "count"})
+//   ]
+// })
+}});
+
+define({id: "3c609e4a", body: () => {
+// [...d3.extent(levels_daily_count_aq, (d) => d.Timestamp)]
+}});
+
+define({id: "ed70f797", body: () => {
+// timeline_plot
+}});
+
 </script>
 <input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
 <label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
@@ -590,7 +629,11 @@ return {degree_boxplot};
 </div>
 <div class="observablehq observablehq--block"><!--:db2fd934:--></div>
 <div class="observablehq observablehq--block"><!--:37b048ad:--></div>
-<h3 id="chart-code" tabindex="-1"><a class="observablehq-header-anchor" href="#chart-code">Chart Code</a></h3>
+<div class="observablehq observablehq--block"><!--:50aa4a8e:--></div>
+<div class="observablehq observablehq--block"><!--:ff066a66:--></div>
+<div class="observablehq observablehq--block"><!--:5c9b9acb:--></div>
+<div class="observablehq observablehq--block"><!--:3c609e4a:--></div>
+<div class="observablehq observablehq--block"><!--:ed70f797:--></div>
 <!-- <div class="card" style="background: none; padding: 2px;">
 ${Inputs.table(search_result)}
 </div>

@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Preeclampsia Graph</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background-color: #111; color: #fff; }
+        #canvas-container { width: 100vw; height: 100vh; display: block; }
+        #node-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 250px;
+            font-size: 12px;
+            display: none; /* Hidden by default */
+            color: #eee;
+        }
+        #node-info h3 { margin-top: 0; margin-bottom: 5px; font-size: 14px; color: #fff; }
+        #node-info p { margin-bottom: 5px; }
+
+        /* Style for 3D Labels */
+        .node-label-3d {
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 10px;
+            pointer-events: none; /* Prevent labels from blocking interaction */
+            white-space: nowrap; /* Keep label on one line */
+            user-select: none; /* Prevent text selection */
+        }
+        /* Style for Plane Labels */
+        .plane-label-3d {
+            color: #ccc; /* Lighter grey */
+            /* background-color set dynamically by JS */
+            padding: 4px 8px; /* Increase padding */
+            border-radius: 4px;
+            font-size: 12px; /* Smaller font size */
+            font-family: monospace, sans-serif; /* Use monospace font */
+            font-weight: bold;
+            pointer-events: none;
+            white-space: pre; /* Allow newline rendering from <br> */
+            user-select: none;
+            text-align: left; /* Align text to the left within the label box */
+            display: inline-block; /* Ensure block behavior for alignment */
+            width: auto; /* Ensure width adjusts to content */
+        }
+
+        /* ADDED: Style for UI Section Labels */
+        /* REMOVED .ui-section-label style */
+
+        /* Layer Toggle Menu */
+        #layer-menu {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 90vh; /* Prevent menu from being too tall */
+            overflow-y: auto; /* Add scroll if needed */
+            font-size: 11px;
+            color: #eee;
+        }
+        #layer-menu h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 12px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 4px;
+        }
+        #layer-menu div {
+            margin-bottom: 4px;
+        }
+        #layer-menu label {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        #layer-menu input[type="checkbox"] {
+            appearance: none; /* Remove default appearance */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: transparent;
+            border: 1px solid #0af; /* Bright blue border */
+            padding: 5px; /* Size of the checkbox */
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-right: 5px; /* Space before label */
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        #layer-menu input[type="checkbox"]:checked {
+             background-color: rgba(0, 170, 255, 0.3); /* Light blue fill when checked */
+             border-color: #0df; /* Brighter blue border */
+        }
+        /* Optional: Add a pseudo-element for a visual checkmark/indicator */
+        #layer-menu input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 7px; /* Adjust size of inner indicator */
+            height: 7px;
+            background-color: #0df; /* Bright blue indicator */
+            /* For a different style checkmark, you could use borders or content:'✔' */
+        }
+        #layer-menu input[type="checkbox"]:hover {
+            border-color: #fff; /* White border on hover */
+        }
+        .spacing-control {
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px solid #444;
+        }
+        .spacing-control label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .spacing-control input[type="range"] {
+            width: 80px;
+            vertical-align: middle;
+        }
+        .spacing-control span {
+            display: inline-block;
+            min-width: 25px;
+            text-align: right;
+        }
+        .layer-menu-item {
+            display: flex;
+            align-items: center; /* Vertically align items in the row */
+            justify-content: space-between; /* Push the two groups apart */
+            padding: 2px 0; /* Add slight vertical padding */
+        }
+        .layer-toggle-group {
+            /* Container for Layer Checkbox + Label */
+            display: flex;
+            align-items: center;
+            /* Optionally set a width if needed for consistent alignment */
+            /* width: 180px; */ 
+        }
+        .label-toggle-group {
+             /* Container for Labels Checkbox + Label */
+            display: flex;
+            align-items: center;
+        }
+        /* ADD Legend CSS */
+        /* #layer-label-legend { ... } */
+        /* .legend-label-item { ... } */
+
+        /* --- Custom Checkbox Styling --- */
+        #layer-menu input[type="checkbox"] {
+            appearance: none; /* Remove default appearance */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: transparent;
+            border: 1px solid #0af; /* Bright blue border */
+            padding: 5px; /* Size of the checkbox */
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-right: 5px; /* Space before label */
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        #layer-menu input[type="checkbox"]:checked {
+             background-color: rgba(0, 170, 255, 0.3); /* Light blue fill when checked */
+             border-color: #0df; /* Brighter blue border */
+        }
+        /* Optional: Add a pseudo-element for a visual checkmark/indicator */
+        #layer-menu input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 7px; /* Adjust size of inner indicator */
+            height: 7px;
+            background-color: #0df; /* Bright blue indicator */
+            /* For a different style checkmark, you could use borders or content:'✔' */
+        }
+        #layer-menu input[type="checkbox"]:hover {
+            border-color: #fff; /* White border on hover */
+        }
+        /* --- End Custom Checkbox Styling --- */
+
+        /* --- Custom Slider Styling --- */
+        #layer-menu input[type="range"] {
+            appearance: none; /* Override default look */
+            -webkit-appearance: none;
+            width: 100px; /* Increase width slightly */
+            height: 3px; /* Thin track */
+            background: #555; /* Darker background for the track */
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            cursor: pointer;
+            vertical-align: middle; /* Re-apply alignment */
+        }
+
+        #layer-menu input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        /* --- Slider Thumb (Chrome, Safari, Edge, Opera) --- */
+        #layer-menu input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            background: #0af; /* Bright blue thumb */
+            border: 1px solid #0df; /* Brighter border */
+            border-radius: 50%; /* Make it round */
+            cursor: pointer;
+            margin-top: -3.5px; /* Adjust vertical position */
+        }
+
+        /* --- Slider Thumb (Firefox) --- */
+        #layer-menu input[type="range"]::-moz-range-thumb {
+            width: 10px;
+            height: 10px;
+            background: #0af;
+            border: 1px solid #0df;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* --- Slider Track (Specific overrides if needed) --- */
+         #layer-menu input[type="range"]::-webkit-slider-runnable-track {
+             width: 100%;
+             height: 3px;
+             cursor: pointer;
+             background: #058; /* Slightly bluish track */
+             border-radius: 1px;
+             border: none;
+         }
+        #layer-menu input[type="range"]::-moz-range-track {
+             width: 100%;
+             height: 3px;
+             cursor: pointer;
+             background: #058;
+             border-radius: 1px;
+             border: none;
+         }
+        /* --- End Custom Slider Styling --- */
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <!-- REMOVE Legend Container -->
+    <div id="layer-menu">
+        <h4>Toggle Layers</h4>
+        <!-- Spacing Control -->
+        <div class="spacing-control">
+            <label for="spacingSlider">Layer Spacing:</label>
+            <input type="range" id="spacingSlider" min="10" max="100" value="40" step="1">
+            <span id="spacingValue">40</span>
+    </div>
+        <!-- Evidence Threshold Control -->
+        <div class="spacing-control">
+        <label for="evidenceSlider">Min Evidence:</label>
+        <input type="range" id="evidenceSlider" min="0" max="100" value="0" step="5">
+        <span id="evidenceValue">0%</span>
+    </div>
+        <!-- Checkboxes will be added here by JS -->
+    </div>
+    <div id="node-info">
+        <h3 id="node-title">Node Title</h3>
+        <p id="node-description">Node description will appear here.</p>
+        <p id="node-codes" style="font-size: 11px; color: #aaa;"></p>
+    </div>
+
+    <!-- Import Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- Preeclampsia Data Object ---
+        const preeclampsiaData = {
+             nodes: [
+                 { id: 'PE', label: 'Preeclampsia', color: 0xff5555, size: 1.5, group: 'core', 
+                   icd10: 'O14.90', snomed: '398254007',
+                   description: 'A pregnancy-specific hypertensive disorder characterized by new-onset hypertension after 20 weeks gestation with proteinuria or end-organ dysfunction.', uiMappings: ['HPI'] },
+                 
+                 { id: 'Def', label: 'Definition', color: 0x5555ff, size: 1.2, group: 'definition', isGroupCore: true,
+                   description: 'New-onset hypertension (≥140/90 mmHg) after 20 weeks gestation with proteinuria (≥300mg/24hr) or end-organ dysfunction.', uiMappings: ['AP'] },
+                 
+                 { id: 'Path', label: 'Pathophysiology', color: 0x55ff55, size: 1.2, group: 'pathophysiology', isGroupCore: true,
+                   snomed: '66214007',
+                   description: 'The underlying mechanisms that lead to preeclampsia.' },
+                 { id: 'PlacIsch', label: 'Placental Ischemia', color: 0x55ff55, size: 1, group: 'pathophysiology',
+                   snomed: '85211001',
+                   description: 'Placental hypoperfusion and ischemia are initial events.' },
+                 { id: 'AntiFac', label: 'Anti-angiogenic Factors', color: 0x55ff55, size: 1, group: 'pathophysiology',
+                   description: 'Increased sFlt-1 and sEng, which are anti-angiogenic factors.' },
+                 { id: 'AntiFac2', label: 'VEGF/PlGF Activity', color: 0x55ff55, size: 1, group: 'pathophysiology',
+                   description: 'Decreased VEGF and PlGF activity due to anti-angiogenic factors.' },
+                 { id: 'EndoDys', label: 'Endothelial Dysfunction', color: 0x55ff55, size: 1, group: 'pathophysiology', 
+                   snomed: '75914005',
+                   description: 'Widespread endothelial dysfunction resulting in clinical manifestations.' },
+                 
+                 { id: 'Manifest', label: 'Clinical Manifestations', color: 0xffaa55, size: 1.2, group: 'manifestations', isGroupCore: true,
+                   snomed: '429945006',
+                   description: 'Signs and symptoms of preeclampsia.' },
+                 { id: 'Lab', label: 'Laboratory Findings', color: 0xffaa55, size: 1, group: 'manifestations', isGroupCore: false, // Not a core group node itself, but a category
+                   snomed: '108252007',
+                   description: 'Key lab results associated with preeclampsia.' },
+                 { id: 'Fet', label: 'Fetal Signs', color: 0xffaa55, size: 1, group: 'manifestations',
+                   description: 'IUGR, oligohydramnios, and abnormal umbilical artery Doppler studies.' },
+                 
+                 { id: 'Manage', label: 'Management', color: 0xaa55ff, size: 1.2, group: 'management', isGroupCore: true,
+                   snomed: '133903001',
+                   description: 'Treatment approaches for preeclampsia.' },
+                 { id: 'Surv', label: 'Surveillance', color: 0xaa55ff, size: 1, group: 'management',
+                   snomed: '410311000',
+                   description: 'Close maternal-fetal surveillance.' },
+                 { id: 'BP', label: 'Blood Pressure Control', color: 0xaa55ff, size: 1, group: 'management',
+                   snomed: '386340008',
+                   description: 'Target blood pressure 140-150/90-100 mmHg.' },
+                 { id: 'MgSO4', label: 'Magnesium Sulfate', color: 0xaa55ff, size: 1, group: 'management',
+                   snomed: '373577005',
+                   description: 'Seizure prophylaxis with magnesium sulfate for severe cases.' },
+                 { id: 'Delivery', label: 'Delivery', color: 0xaa55ff, size: 1, group: 'management',
+                   snomed: '287937003',
+                   description: 'Definitive treatment is delivery of the placenta.', uiMappings: ['AP'] },
+                 
+                 { id: 'Severe', label: 'Severe Features', color: 0xff5555, size: 1.2, group: 'severity', isGroupCore: true, // Changed group
+                   icd10: 'O14.10', snomed: '119914001',
+                   description: 'Features indicating severe preeclampsia requiring prompt intervention.' },
+                 { id: 'SevSigns', label: 'Severe Signs', color: 0xff5555, size: 1, group: 'severity', // Changed group
+                   description: 'BP ≥160/110 mmHg, thrombocytopenia (<100K), impaired liver function, progressive renal insufficiency, pulmonary edema, cerebral/visual disturbances.', uiMappings: ['ExamLabs'] },
+
+                 { id: 'Complic', label: 'Complications', color: 0xff55aa, size: 1.2, group: 'complications', isGroupCore: true,
+                   snomed: '111991009',
+                   description: 'Possible complications of preeclampsia.' },
+                 { id: 'Eclamp', label: 'Eclampsia', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'O15.9', snomed: '4694006',
+                   description: 'Development of seizures in a woman with preeclampsia.' },
+                 { id: 'HELLP', label: 'HELLP Syndrome', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'O14.20', snomed: '36094001',
+                   description: 'Hemolysis, Elevated Liver enzymes, Low Platelets syndrome.' },
+                 { id: 'PulmEdema', label: 'Pulmonary Edema', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'J81.0', snomed: '50170009', description: 'Fluid accumulation in the air spaces and parenchyma of the lungs.'},
+                 { id: 'DIC', label: 'DIC', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'D65', snomed: '61470002', description: 'Disseminated Intravascular Coagulation: Widespread activation of clotting.'},
+                 { id: 'PlacAbrupt', label: 'Placental Abruption', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'O45.90', snomed: '44697007', description: 'Premature separation of the placenta from the uterus.'},
+                 { id: 'MatFetDeath', label: 'Maternal/Fetal Death', color: 0xff55aa, size: 1, group: 'complications',
+                    description: 'Death of the mother or fetus as a complication.'},
+                { id: 'Nausea', label: 'Nausea', color: 0xffaa55, size: 1, group: 'manifestations',
+                  icd10: 'R11.0', snomed: '422587007', description: 'Feeling of sickness with an inclination to vomit.'},
+                { id: 'EpiPain', label: 'Epigastric Pain', color: 0xffaa55, size: 1, group: 'manifestations', 
+                  icd10: 'R10.13', snomed: '419076005', description: 'Pain in the upper central region of the abdomen.'},
+                 { id: 'Hemorrhage', label: 'Hemorrhage', color: 0xff55aa, size: 1, group: 'complications',
+                   icd10: 'R58', snomed: '50960005', description: 'An escape of blood from a ruptured blood vessel.'},
+                 { id: 'AltDx', label: 'Alternative Diagnoses', color: 0xaaaaaa, size: 1.2, group: 'alternatives', isGroupCore: true,
+                   description: 'Other possible diagnoses to consider.'},
+                 { id: 'BiliaryDx', label: 'Biliary System Disorders', color: 0xaaaaaa, size: 1, group: 'alternatives',
+                   icd10: 'K83.9', snomed: '111326007', description: 'Disorders affecting the gallbladder, bile ducts, or bile.'},
+
+                // Risk Factors
+                 { id: 'RiskFactors', label: 'Risk Factors', color: 0x00ced1, size: 1.2, group: 'risk', isGroupCore: true, description: 'Factors increasing the likelihood of developing preeclampsia.', uiMappings: ['PMHx'] },
+                 { id: 'PrevPE', label: 'Previous Preeclampsia', color: 0x00ced1, size: 1, group: 'risk', description: 'History of preeclampsia in a prior pregnancy.' },
+                 { id: 'FirstPreg', label: 'First Pregnancy', color: 0x00ced1, size: 1, group: 'risk', description: 'Nulliparity (first time being pregnant).' },
+                 { id: 'FamHist', label: 'Family History', color: 0x00ced1, size: 1, group: 'risk', description: 'Family history of preeclampsia (e.g., mother or sister).' },
+                 { id: 'MultGest', label: 'Multiple Gestation', color: 0x00ced1, size: 1, group: 'risk', description: 'Carrying twins, triplets, or more.' },
+                 { id: 'ChronHTN', label: 'Chronic Hypertension', color: 0x00ced1, size: 1, group: 'risk', description: 'Pre-existing high blood pressure.' },
+                 { id: 'Diabetes', label: 'Diabetes', color: 0x00ced1, size: 1, group: 'risk', description: 'Pre-existing Type 1 or Type 2 diabetes.' },
+                 { id: 'Obesity', label: 'Obesity', color: 0x00ced1, size: 1, group: 'risk', description: 'Pre-pregnancy obesity (BMI ≥ 30).' },
+                 { id: 'AdvMatAge', label: 'Advanced Maternal Age', color: 0x00ced1, size: 1, group: 'risk', description: 'Maternal age typically ≥ 35 or 40 years.' },
+
+                // Prevention
+                 { id: 'Prevention', label: 'Prevention Strategies', color: 0x98fb98, size: 1.2, group: 'prevent', isGroupCore: true, description: 'Measures to reduce the risk or severity.' },
+                 { id: 'LowDoseASA', label: 'Low-Dose Aspirin', color: 0x98fb98, size: 1, group: 'prevent', description: 'Recommended for high-risk women, usually started before 16 weeks.', uiMappings: ['AP'] },
+                 { id: 'CalciumSupp', label: 'Calcium Supplementation', color: 0x98fb98, size: 1, group: 'prevent', description: 'May be beneficial in populations with low calcium intake.' },
+                 { id: 'PrenatalCare', label: 'Regular Prenatal Care', color: 0x98fb98, size: 1, group: 'prevent', description: 'Early detection and monitoring through regular checkups.' },
+
+                 // Diagnostic Criteria
+                 { id: 'DiagCriteria', label: 'Diagnostic Criteria', color: 0xffd700, size: 1.2, group: 'diag', isGroupCore: true, description: 'Specific criteria used to diagnose preeclampsia.' },
+                 { id: 'BPThresh', label: 'BP Thresholds', color: 0xffd700, size: 1, group: 'diag', description: 'Sustained BP ≥140 mmHg systolic or ≥90 mmHg diastolic.' },
+                 { id: 'ProteinuriaMeas', label: 'Proteinuria', color: 0xffd700, size: 1, group: 'diag', description: '≥300 mg/24-hour urine collection, or protein/creatinine ratio ≥0.3, or dipstick ≥1+.' },
+                 { id: 'Timing20Wk', label: 'Timing', color: 0xffd700, size: 1, group: 'diag', description: 'New onset after 20 weeks of gestation.' },
+                 { id: 'EndOrganDys', label: 'End-Organ Dysfunction', color: 0xffd700, size: 1, group: 'diag', description: 'Alternatively, new-onset HTN with severe features (thrombocytopenia, renal insufficiency, liver dysfunction, pulmonary edema, cerebral/visual symptoms) in absence of proteinuria.'},
+
+                // Laboratory Details (linked to existing 'Lab' node)
+                 { id: 'ElevLiverEnz', label: 'Elevated Liver Enzymes', color: 0xffaa55, size: 1, group: 'lab_detail', description: 'AST/ALT levels typically >2x upper limit of normal.' },
+                 { id: 'Thrombocytopenia', label: 'Thrombocytopenia', color: 0xffaa55, size: 1, group: 'lab_detail', description: 'Platelet count <100,000/microL.' },
+                 { id: 'ProteinuriaDetail', label: 'Proteinuria Details', color: 0xffaa55, size: 1, group: 'lab_detail', description: 'Specific measurements confirming protein in urine (≥300mg/24hr or ratio ≥0.3).' },
+                 { id: 'UricAcid', label: 'Uric Acid Levels', color: 0xffaa55, size: 1, group: 'lab_detail', description: 'Often elevated, reflecting reduced renal clearance.' },
+
+                 // Post-Delivery
+                 { id: 'PostDelivery', label: 'Post-Delivery', color: 0x87ceeb, size: 1.2, group: 'post', isGroupCore: true, description: 'Considerations after pregnancy.' },
+                 { id: 'Recovery', label: 'Recovery Timeline', color: 0x87ceeb, size: 1, group: 'post', description: 'BP and symptoms usually resolve within days to weeks postpartum.' },
+                 { id: 'LongTermHealth', label: 'Long-Term Health Risks', color: 0x87ceeb, size: 1, group: 'post', description: 'Increased risk of future cardiovascular disease, hypertension, stroke, and kidney disease.' },
+                { id: 'FuturePregRisk', label: 'Future Pregnancy Risks', color: 0x87ceeb, size: 1, group: 'post', description: 'Increased risk of preeclampsia in subsequent pregnancies.' },
+
+                 // Severity Classification (linked to existing 'Severe' node)
+                { id: 'MildSevere', label: 'Mild vs. Severe', color: 0xff5555, size: 1, group: 'severity', description: 'Distinction based on blood pressure levels and presence of severe features.' },
+                { id: 'WithWithoutSevere', label: 'With/Without Severe Features', color: 0xff5555, size: 1, group: 'severity', description: 'Current classification focuses on presence or absence of severe features rather than "mild".' },
+
+                // Added individual maternal signs, replacing 'Mat' node
+                { id: 'HypertensionSymp', label: 'Hypertension', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Elevated blood pressure (symptom context).', uiMappings: ['HPI', 'ExamLabs', 'AP']},
+                { id: 'ProteinuriaSymp', label: 'Proteinuria', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Presence of excess proteins in urine (symptom context).', uiMappings: ['HPI', 'ExamLabs']},
+                { id: 'Edema', label: 'Edema', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Swelling caused by excess fluid trapped in the body\'s tissues.'},
+                { id: 'Hyperreflexia', label: 'Hyperreflexia', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Overactive or overresponsive reflexes.', uiMappings: ['ExamLabs']},
+                { id: 'Headache', label: 'Headache', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Persistent or new-onset headache.', uiMappings: ['HPI', 'ROS']},
+                { id: 'VisualDisturb', label: 'Visual Disturbances', color: 0xffaa55, size: 1, group: 'manifestations', description: 'Blurred vision, flashing lights, or scotomata.', uiMappings: ['HPI', 'ROS']}
+            ],
+             links: [ /* Links data is large, assuming it's copied here correctly */ 
+                // Existing Links (up to AltDx)
+                 { source: 'PE', target: 'Def', evidence: 95, patientCount: 1900, cohortSize: 2000 },
+                 { source: 'PE', target: 'Path', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                 { source: 'PE', target: 'Manifest', evidence: 90, patientCount: 1800, cohortSize: 2000 },
+                 { source: 'PE', target: 'Manage', evidence: 80, patientCount: 1600, cohortSize: 2000 },
+                 { source: 'PE', target: 'Complic', evidence: 75, patientCount: 1500, cohortSize: 2000 },
+                 { source: 'PE', target: 'AltDx', evidence: 30, patientCount: 600, cohortSize: 2000 },
+
+                 { source: 'Path', target: 'PlacIsch', evidence: 65, patientCount: 1300, cohortSize: 2000 },
+                 { source: 'PlacIsch', target: 'AntiFac', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+                 { source: 'AntiFac', target: 'AntiFac2', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                 { source: 'AntiFac2', target: 'EndoDys', evidence: 65, patientCount: 1300, cohortSize: 2000 },
+
+                 { source: 'Manifest', target: 'Fet', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+                 { source: 'Manifest', target: 'Nausea', evidence: 45, patientCount: 900, cohortSize: 2000 },
+                 { source: 'Manifest', target: 'EpiPain', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                 { source: 'Manifest', target: 'Severe', evidence: 80, patientCount: 1600, cohortSize: 2000 },
+
+                 { source: 'Manage', target: 'Surv', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                 { source: 'Manage', target: 'BP', evidence: 75, patientCount: 1500, cohortSize: 2000 },
+                 { source: 'Manage', target: 'MgSO4', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                 { source: 'Manage', target: 'Delivery', evidence: 90, patientCount: 1800, cohortSize: 2000 },
+
+                 { source: 'Severe', target: 'SevSigns', evidence: 85, patientCount: 1700, cohortSize: 2000 },
+                 { source: 'Severe', target: 'EpiPain', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+
+                 { source: 'Complic', target: 'Eclamp', evidence: 75, patientCount: 1500, cohortSize: 2000 },
+                 { source: 'Complic', target: 'HELLP', evidence: 75, patientCount: 1500, cohortSize: 2000 },
+                 { source: 'Complic', target: 'PulmEdema', evidence: 40, patientCount: 800, cohortSize: 2000 },
+                 { source: 'Complic', target: 'DIC', evidence: 40, patientCount: 800, cohortSize: 2000 },
+                 { source: 'Complic', target: 'PlacAbrupt', evidence: 40, patientCount: 800, cohortSize: 2000 },
+                 { source: 'Complic', target: 'MatFetDeath', evidence: 40, patientCount: 800, cohortSize: 2000 },
+                 { source: 'Complic', target: 'Hemorrhage', evidence: 35, patientCount: 700, cohortSize: 2000 },
+
+                 { source: 'AltDx', target: 'BiliaryDx', evidence: 20, patientCount: 400, cohortSize: 2000 },
+
+                 // --- NEW LINKS START HERE ---
+                 { source: 'PE', target: 'RiskFactors', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                 { source: 'PE', target: 'Prevention', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+                 { source: 'PE', target: 'DiagCriteria', evidence: 80, patientCount: 1600, cohortSize: 2000 },
+                 { source: 'PE', target: 'PostDelivery', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+
+                 { source: 'RiskFactors', target: 'PrevPE', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'FirstPreg', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'FamHist', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'MultGest', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'ChronHTN', evidence: 65, patientCount: 1300, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'Diabetes', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'Obesity', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                 { source: 'RiskFactors', target: 'AdvMatAge', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+
+                 { source: 'Prevention', target: 'LowDoseASA', evidence: 65, patientCount: 1300, cohortSize: 2000 },
+                 { source: 'Prevention', target: 'CalciumSupp', evidence: 45, patientCount: 900, cohortSize: 2000 },
+                 { source: 'Prevention', target: 'PrenatalCare', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+
+                 { source: 'DiagCriteria', target: 'Def', evidence: 90, patientCount: 1800, cohortSize: 2000 },
+                 { source: 'DiagCriteria', target: 'BPThresh', evidence: 95, patientCount: 1900, cohortSize: 2000 },
+                 { source: 'DiagCriteria', target: 'ProteinuriaMeas', evidence: 90, patientCount: 1800, cohortSize: 2000 },
+                 { source: 'DiagCriteria', target: 'Timing20Wk', evidence: 95, patientCount: 1900, cohortSize: 2000 },
+                 { source: 'DiagCriteria', target: 'EndOrganDys', evidence: 85, patientCount: 1700, cohortSize: 2000 },
+
+                 { source: 'Lab', target: 'ElevLiverEnz', evidence: 80, patientCount: 1600, cohortSize: 2000 },
+                 { source: 'Lab', target: 'Thrombocytopenia', evidence: 85, patientCount: 1700, cohortSize: 2000 },
+                 { source: 'Lab', target: 'ProteinuriaDetail', evidence: 90, patientCount: 1800, cohortSize: 2000 },
+                 { source: 'Lab', target: 'UricAcid', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+
+                 { source: 'PostDelivery', target: 'Recovery', evidence: 80, patientCount: 1600, cohortSize: 2000 },
+                 { source: 'PostDelivery', target: 'LongTermHealth', evidence: 65, patientCount: 1300, cohortSize: 2000 },
+                 { source: 'PostDelivery', target: 'FuturePregRisk', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+
+                { source: 'Severe', target: 'MildSevere', evidence: 70, patientCount: 1400, cohortSize: 2000 },
+                { source: 'Severe', target: 'WithWithoutSevere', evidence: 75, patientCount: 1500, cohortSize: 2000 },
+
+                { source: 'Manifest', target: 'HypertensionSymp', evidence: 85, patientCount: 1700, cohortSize: 2000 },
+                { source: 'Manifest', target: 'ProteinuriaSymp', evidence: 85, patientCount: 1700, cohortSize: 2000 },
+                { source: 'Manifest', target: 'Edema', evidence: 60, patientCount: 1200, cohortSize: 2000 },
+                { source: 'Manifest', target: 'Hyperreflexia', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+                { source: 'Manifest', target: 'Headache', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                { source: 'Manifest', target: 'VisualDisturb', evidence: 50, patientCount: 1000, cohortSize: 2000 },
+                { source: 'Manifest', target: 'EpiPain', evidence: 55, patientCount: 1100, cohortSize: 2000 },
+                { source: 'Manifest', target: 'Lab', evidence: 80, patientCount: 1600, cohortSize: 2000 }
+             ]
+        };
+        // --- Remove the old 'Mat' node if it exists (safety check) ---
+        preeclampsiaData.nodes = preeclampsiaData.nodes.filter(node => node.id !== 'Mat');
+
+        // --- Three.js Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        let css2DRenderer; // Declare here to access in resize/animate
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // --- CSS2D Renderer for Labels ---
+        css2DRenderer = new CSS2DRenderer();
+        css2DRenderer.setSize(window.innerWidth, window.innerHeight);
+        css2DRenderer.domElement.style.position = 'absolute';
+        css2DRenderer.domElement.style.top = '0px';
+        css2DRenderer.domElement.style.pointerEvents = 'none'; // Important for controls
+        document.body.appendChild(css2DRenderer.domElement);
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0xcccccc, 0.5); // Soft ambient light
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); // Directional light
+        directionalLight.position.set(1, 1, 0.5).normalize();
+        scene.add(directionalLight);
+
+        // --- Controls ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Smooths camera movement
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = true; // Enable screen space panning
+        controls.minDistance = 5;
+        controls.maxDistance = 500;
+
+        // --- Data Processing & Object Creation ---
+        const nodeObjects = new Map(); // Map node ID to Three.js object
+        const nodeGroup = new THREE.Group(); // Group for nodes
+        const linkGroup = new THREE.Group(); // Group for links
+        const labelGroup = new THREE.Group(); // Group specifically for labels
+        const layerVizGroup = new THREE.Group();
+        const uiPlaneGroup = new THREE.Group(); // ADDED: Group for UI planes
+        const connectorLineGroup = new THREE.Group(); // ADDED: Group for connector lines
+        // REMOVED: allUiSectionLabels array
+        scene.add(nodeGroup);
+        scene.add(linkGroup);
+        scene.add(labelGroup);
+        scene.add(layerVizGroup);
+        scene.add(uiPlaneGroup); // ADDED: Add UI plane group to scene
+        scene.add(connectorLineGroup); // ADDED: Add connector line group to scene
+
+        // --- Store Layer Visual Elements ---
+        const layerVisuals = new Map(); // Map layer index to { plane, planeLabel, uiPlane }
+
+        const nodeGeometry = new THREE.SphereGeometry(1, 32, 16); 
+        const connectorLineMaterial = new THREE.LineBasicMaterial({ // ADDED: Material for connectors
+            color: 0xaaaaaa,
+            transparent: true,
+            opacity: 0.4, 
+            depthWrite: false // Don't obscure things behind
+        }); 
+        let currentLayerZSpacing = 40; // Make spacing mutable
+        let currentEvidenceThreshold = 0; // Store current threshold
+        const inactiveOpacity = 0.1; // Opacity for inactive elements
+        const inactiveColor = new THREE.Color(0x555555);
+
+        // --- Layer Calculation (Based on Group) ---
+        // Define MAJOR layers and which groups belong to them
+        
+        const majorLayerDefinitions = [
+            { index: 0, groups: ['core'] }, // Remove uiMappings
+            { index: 1, groups: ['definition', 'diag'] }, // Remove uiMappings
+            { index: 2, groups: ['risk', 'pathophysiology'] }, // Remove uiMappings
+            { index: 3, groups: ['manifestations', 'lab_detail', 'severity'] }, // Remove uiMappings
+            { index: 4, groups: ['complications'] }, // Remove uiMappings
+            { index: 5, groups: ['management', 'prevent'] }, // Remove uiMappings
+            { index: 6, groups: ['post', 'alternatives'] }, // Remove uiMappings
+        ];
+
+        // Map each original group to its major layer index
+        const groupToMajorLayerIndex = new Map();
+        majorLayerDefinitions.forEach(layerDef => {
+            layerDef.groups.forEach(groupName => {
+                groupToMajorLayerIndex.set(groupName, layerDef.index);
+            });
+        });
+        const defaultMajorLayerIndex = Math.max(...majorLayerDefinitions.map(l => l.index)) + 1;
+
+        // Assign layer index to each node
+        const nodesById = new Map(); // Still useful for node lookup
+        preeclampsiaData.nodes.forEach(node => {
+            node.majorLayerIndex = groupToMajorLayerIndex.get(node.group) ?? defaultMajorLayerIndex;
+            nodesById.set(node.id, { ...node }); // Store node data with layer index
+            // Assign PE explicitly to layer 0 if its group wasn't 'core' for some reason
+            if (node.id === 'PE') {
+                node.majorLayerIndex = 0; 
+                nodesById.get(node.id).majorLayerIndex = 0;
+            }
+        });
+
+        // --- Adjacency List for Reachability --- 
+        const adjacencyList = new Map();
+        preeclampsiaData.links.forEach(link => {
+            if (!adjacencyList.has(link.source)) adjacencyList.set(link.source, []);
+            if (!adjacencyList.has(link.target)) adjacencyList.set(link.target, []);
+            adjacencyList.get(link.source).push({ target: link.target, evidence: link.evidence });
+            adjacencyList.get(link.target).push({ target: link.source, evidence: link.evidence }); // Store evidence needed for traversal
+        });
+
+        // Group nodes by MAJOR layer, then by original group within that layer
+        const nodesByMajorLayerThenGroup = new Map();
+        let maxLayer = 0;
+        for (const node of nodesById.values()) {
+            const majorLayerIndex = node.majorLayerIndex;
+
+            // Ensure the major layer map entry exists
+            if (!nodesByMajorLayerThenGroup.has(majorLayerIndex)) {
+                nodesByMajorLayerThenGroup.set(majorLayerIndex, new Map());
+            }
+            const groupsInLayer = nodesByMajorLayerThenGroup.get(majorLayerIndex);
+
+            // Ensure the original group map entry exists within the major layer
+            const originalGroup = node.group;
+            if (!groupsInLayer.has(originalGroup)) {
+                groupsInLayer.set(originalGroup, []);
+            }
+            groupsInLayer.get(originalGroup).push(node);
+            // Calculate maxLayer based on assigned layer indices
+            if (majorLayerIndex !== defaultMajorLayerIndex && majorLayerIndex > maxLayer) { 
+                maxLayer = majorLayerIndex;
+            }
+        }
+
+        // --- Particle System Setup ---
+        const particleGroup = new THREE.Group();
+        scene.add(particleGroup);
+        let activeParticles = [];
+        const MAX_PARTICLES = 5000; // Global limit for performance
+        const particlePositions = new Float32Array(MAX_PARTICLES * 3);
+        const particleColors = new Float32Array(MAX_PARTICLES * 3);
+        const particleGeometry = new THREE.BufferGeometry();
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3).setUsage(THREE.DynamicDrawUsage));
+        particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3).setUsage(THREE.DynamicDrawUsage));
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 1.5,          // Increased particle size
+            vertexColors: true,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending, // Brighter where particles overlap
+            depthWrite: false
+        });
+        const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+        particleSystem.visible = true; // Start visible
+        particleGroup.add(particleSystem);
+
+        const particleBaseSpeed = 0.5; 
+        const particleBaseEmissionRate = 0.01; // Lower base rate
+        const maxParticlesPerLink = 5; // Limit per link
+
+        // --- Create Nodes with Layered Positions ---
+        // const layerZSpacing = 40; // Now using currentLayerZSpacing
+        const basePlaneRadius = 10; // Base radius for nodes on a plane
+        const planeRadiusIncrementPerNode = 0.5; // Increase radius slightly based on node count
+        const baseNodeScale = 1.5; // Adjust overall node sizes if needed
+
+        // New constants for cluster layout
+        const clusterCenterRadiusBase = 15;       // Base radius for arranging cluster centers
+        const clusterCenterRadiusPerGroup = 3;    // How much radius increases per group on plane
+        const nodeRadiusAroundCluster = 5;        // Radius for nodes around their cluster center
+
+        // Constants for UI Plane layout
+        const uiPlaneXOffset = 10; // Gap between data plane area and UI plane
+
+        // --- Create Highlight Overlay Mesh ---
+        // Function and call below are removed
+        /*
+        function createHighlightOverlay() {
+            const highlightGeometry = new THREE.PlaneGeometry(1, 1); // Size will be set via scale
+            const highlightMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffff00, // Bright yellow
+                transparent: true,
+                opacity: 0.4,    // Semi-transparent
+                side: THREE.DoubleSide,
+                depthWrite: false // Render on top without hiding things behind
+            });
+            highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+            highlightMesh.visible = false; // Start hidden
+            highlightMesh.position.z = 0.1; // Slightly in front of the plane it's highlighting
+            uiPlaneGroup.add(highlightMesh); // Add to the UI group
+        }
+        createHighlightOverlay();
+        */
+
+        // Iterate through MAJOR layers
+        nodesByMajorLayerThenGroup.forEach((groupsInLayerMap, majorLayerIndex) => {
+            const layerZ = majorLayerIndex * currentLayerZSpacing;
+            const numGroupsInLayer = groupsInLayerMap.size;
+            const clusterCenterRadius = clusterCenterRadiusBase + numGroupsInLayer * clusterCenterRadiusPerGroup;
+            const clusterCenterAngleStep = numGroupsInLayer > 0 ? (2 * Math.PI) / numGroupsInLayer : 0;
+
+            let groupIndex = 0;
+            // Iterate through ORIGINAL groups within this major layer
+            groupsInLayerMap.forEach((nodesInGroup, originalGroupName) => {
+                // 1. Calculate the center for this original group's cluster
+                const clusterAngle = groupIndex * clusterCenterAngleStep;
+                const clusterX = clusterCenterRadius * Math.cos(clusterAngle);
+                const clusterY = clusterCenterRadius * Math.sin(clusterAngle);
+                const clusterCenter = new THREE.Vector3(clusterX, clusterY, layerZ);
+
+                // Handle single-node groups (like PE) - place at cluster center
+                if (nodesInGroup.length === 1) {
+                    const nodeData = nodesInGroup[0];
+                    if (nodeData.id === 'PE') { // Explicitly center PE if it's alone
+                        clusterCenter.set(0,0,layerZ); 
+                    }
+                    // Create the single node at the cluster center
+                    createNodeObject(nodeData, clusterCenter, majorLayerIndex === defaultMajorLayerIndex);
+                } else {
+                    // 2. Position nodes within this group around the cluster center
+                    const nodesInGroupCount = nodesInGroup.length;
+                    const nodeAngleStep = nodesInGroupCount > 0 ? (2 * Math.PI) / nodesInGroupCount : 0;
+
+                    nodesInGroup.forEach((nodeData, nodeIndex) => {
+                        const nodeAngle = nodeIndex * nodeAngleStep;
+                        const nodeX = clusterCenter.x + nodeRadiusAroundCluster * Math.cos(nodeAngle);
+                        const nodeY = clusterCenter.y + nodeRadiusAroundCluster * Math.sin(nodeAngle);
+                        const nodePosition = new THREE.Vector3(nodeX, nodeY, layerZ);
+                        // Create the node object
+                        createNodeObject(nodeData, nodePosition, majorLayerIndex === defaultMajorLayerIndex);
+                    });
+                }
+                groupIndex++;
+            });
+        });
+
+        // Helper function to create node mesh and label (refactored from loop)
+        function createNodeObject(nodeData, position, isUnreachable = false) {
+            const nodeMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(nodeData.color),
+                roughness: 0.7,
+                metalness: 0.1,
+                // Add emissive property for highlighting later
+                emissive: new THREE.Color(0x000000) 
+            });
+
+            // Handle unreachable nodes (optional: different material/size?)
+            if (isUnreachable) {
+                console.warn(`Positioning unreachable/default group node: ${nodeData.id}`);
+            }
+
+            const sphere = new THREE.Mesh(nodeGeometry, nodeMaterial);
+
+            const scale = (nodeData.size || 1) * baseNodeScale;
+            sphere.scale.set(scale, scale, scale);
+
+            sphere.position.copy(position);
+            sphere.userData = nodeData; // Attach original data
+
+            nodeObjects.set(nodeData.id, sphere);
+                nodeGroup.add(sphere);
+
+            // --- Create 3D Label ---
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'node-label-3d';
+            labelDiv.textContent = nodeData.label;
+
+            const labelObject = new CSS2DObject(labelDiv);
+            // Position label slightly above the sphere
+            const labelOffset = (nodeData.size || 1) * baseNodeScale * 1.2; // Offset based on sphere size
+            labelObject.position.set(position.x, position.y + labelOffset, position.z);
+            labelObject.userData = { nodeId: nodeData.id }; // Link label to node if needed
+            labelGroup.add(labelObject);
+        }
+
+        // --- Create Layer Visualization Spheres ---
+        // Remove Sphere visualization, replace with Planes
+        layerVizGroup.clear(); // Remove old spheres if any
+        const layerVizMaterial = new THREE.MeshBasicMaterial({
+            color: 0x444444, // Slightly darker grey for planes
+            transparent: true,
+            opacity: 0.18, // Keep consistent opacity from previous step
+            side: THREE.DoubleSide, // Render both sides
+            depthWrite: false // Don't obscure objects behind
+        });
+
+        // Calculate plane size based on the cluster centers arrangement
+        const maxGroupsOnLayer = Math.max(...Array.from(nodesByMajorLayerThenGroup.values()).map(map => map.size));
+        const maxClusterRadius = clusterCenterRadiusBase + maxGroupsOnLayer * clusterCenterRadiusPerGroup;
+        const dataPlaneSize = (maxClusterRadius + nodeRadiusAroundCluster) * 2.2; // Ensure data plane covers clusters
+        const uiPlaneSize = dataPlaneSize; // Keep UI plane same size for simplicity
+
+        for (let i = 0; i <= maxLayer; i++) {
+            // Draw planes even for layer 0 if desired
+            const layerZ = i * currentLayerZSpacing;
+
+            // --- Define Distinct Colors per Layer --- 
+            const layerColors = [
+                0x1f77b4, // Muted Blue
+                0xff7f0e, // Orange
+                0x2ca02c, // Green
+                0xd62728, // Red
+                0x9467bd, // Purple
+                0x8c564b, // Brown
+                0xe377c2, // Pink
+                0x7f7f7f, // Grey
+                0xbcbd22, // Olive
+                0x17becf  // Cyan
+            ];
+            const planeColor = new THREE.Color(layerColors[i % layerColors.length]); // Cycle through colors
+
+            // --- Create Unique Material for this Plane (Vary Color Slightly) ---
+            const uniquePlaneMaterial = new THREE.MeshBasicMaterial({
+                 color: planeColor,
+                 transparent: true,
+                 opacity: 0.18, // Make planes slightly more visible with distinct colors
+                 side: THREE.DoubleSide,
+                 visible: true, // Start visible
+                 depthWrite: false
+             });
+
+            const planeGeometry = new THREE.PlaneGeometry(dataPlaneSize, dataPlaneSize);
+            const layerPlane = new THREE.Mesh(planeGeometry, uniquePlaneMaterial);
+            // Planes are created in XY, so just set Z position
+            layerPlane.position.z = layerZ;
+
+            // Store the plane mesh
+            if (!layerVisuals.has(i)) layerVisuals.set(i, {});
+            layerPlane.userData = { majorLayerIndex: i }; // Store layer index on plane mesh
+            layerVisuals.get(i).plane = layerPlane;
+
+            layerVizGroup.add(layerPlane);
+
+            // --- Create Adjacent UI Plane ---
+            // Generate the default texture for this layer
+            const defaultTexture = createClinicalNoteTexture(); 
+            
+            const uiPlaneMaterial = new THREE.MeshBasicMaterial({
+                map: defaultTexture, // Use the default texture initially
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85, 
+                depthWrite: false 
+            });
+            const uiPlaneGeometry = new THREE.PlaneGeometry(uiPlaneSize, uiPlaneSize);
+            const uiPlaneMesh = new THREE.Mesh(uiPlaneGeometry, uiPlaneMaterial);
+            // Position UI plane to the right of the data plane
+            uiPlaneMesh.position.set(dataPlaneSize / 2 + uiPlaneXOffset + uiPlaneSize / 2, 0, layerZ);
+            uiPlaneMesh.userData = { majorLayerIndex: i }; // Remove sectionLabels array
+            uiPlaneGroup.add(uiPlaneMesh);
+            
+            // Store references in layerVisuals
+            layerVisuals.get(i).uiPlane = uiPlaneMesh;
+            layerVisuals.get(i).uiMaterial = uiPlaneMaterial; // Store material
+            layerVisuals.get(i).defaultTexture = defaultTexture; // Store default texture
+
+            // --- Create Plane Label (Back to CSS2DObject) ---
+            // Helper function for Title Case
+            function toTitleCase(str) {
+                return str.toLowerCase().split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+            }
+
+            const layerDef = majorLayerDefinitions.find(def => def.index === i);
+            const description = layerDef 
+                 ? layerDef.groups.join(', ')
+                 : 'Default';
+            const titleCasedDescription = toTitleCase(description.replace(/_/g, ' ')); // Replace underscores too
+            const labelHtml = `Layer ${i}:<br>${titleCasedDescription}`; // Use HTML with <br>
+
+            const planeLabelDiv = document.createElement('div');
+            planeLabelDiv.className = 'plane-label-3d'; // Use original class
+            planeLabelDiv.innerHTML = labelHtml; // Use innerHTML to render the <br>
+
+            // Apply Color Coding from Plane 
+            const r = Math.round(planeColor.r * 255);
+            const g = Math.round(planeColor.g * 255);
+            const b = Math.round(planeColor.b * 255);
+            planeLabelDiv.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.8)`; 
+            planeLabelDiv.style.borderColor = `#${planeColor.getHexString()}`; 
+            planeLabelDiv.style.borderWidth = '1px';
+            planeLabelDiv.style.borderStyle = 'solid';
+            planeLabelDiv.style.color = '#f0f0f0'; 
+
+            const planeLabelObject = new CSS2DObject(planeLabelDiv);
+            // Position snug against the LEFT edge of data plane, staggered vertically 
+            // const uiPlaneRightEdgeX = dataPlaneSize / 2 + uiPlaneXOffset + uiPlaneSize;
+            // const labelColumnX = uiPlaneRightEdgeX + 2; // No longer needed
+            const targetX = -dataPlaneSize / 2; // Align with left edge of data plane
+            const baseY = dataPlaneSize * 0.48; // Base Y near top edge
+            const yOffset = i * 8; // Stagger upwards based on layer index
+            planeLabelObject.position.set(
+                targetX,               // Position snug against the LEFT edge of data plane
+                baseY + yOffset,       // Near Top Edge + Stagger Up
+                layerZ + 0.1           // Slightly in front of plane
+            );
+            planeLabelObject.userData = { planeLayerIndex: i }; 
+            planeLabelObject.visible = true; 
+            
+            // Store the CSS2DObject 
+            layerVisuals.get(i).planeLabel = planeLabelObject; 
+            labelGroup.add(planeLabelObject); // Add back to the label group
+
+            // --- Create Connector Line ---
+            const startPoint = new THREE.Vector3(
+                targetX,           // Label's X
+                baseY + yOffset,   // Label's Y
+                layerZ + 0.05      // Slightly behind label
+            );
+            const cornerPoint = new THREE.Vector3(
+                -dataPlaneSize / 2 + 1, // Slightly inside plane's left edge
+                baseY + yOffset,       // Same Y as label
+                layerZ + 0.05          // Same Z
+            );
+            const endPoint = new THREE.Vector3(
+                -dataPlaneSize / 2 + 1, // Slightly inside plane's left edge
+                0,                      // Vertically centered on plane
+                layerZ + 0.05          // Same Z
+            );
+            
+            const points = [startPoint, cornerPoint, endPoint];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, connectorLineMaterial);
+            line.userData = { layerIndex: i }; // Store index for updates
+            
+            // Store and add to group
+            layerVisuals.get(i).connectorLine = line;
+            connectorLineGroup.add(line);
+            // --- End Connector Line ---
+
+            // REMOVE HTML Element storage/creation
+            /*
+            const layerLabelLegendContainer = document.getElementById('layer-label-legend');
+            planeLabelDiv.id = `plane-label-div-${i}`; 
+            planeLabelDiv.className = 'legend-label-item';
+            if (layerLabelLegendContainer) {
+                layerLabelLegendContainer.appendChild(planeLabelDiv);
+            }
+            layerVisuals.get(i).planeLabelElement = planeLabelDiv; 
+            */
+        }
+
+        // --- Create Links ---
+        const linkMaterial = new THREE.LineBasicMaterial({ 
+            color: 0xaaaaaa, 
+            transparent: true, 
+            opacity: 0.3 
+        });
+        const linkMeshes = []; // Store line meshes for potential updates
+
+        preeclampsiaData.links.forEach(linkData => {
+            const sourceNode = nodeObjects.get(linkData.source);
+            const targetNode = nodeObjects.get(linkData.target);
+
+            if (sourceNode && targetNode) {
+                // Use dynamic points for links
+                const points = [sourceNode.position, targetNode.position];
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                
+                const linkOpacity = 0.1 + (linkData.evidence / 100) * 0.5; 
+                const dynamicMaterial = linkMaterial.clone();
+                dynamicMaterial.opacity = linkOpacity;
+                
+                // Use a different color/style for links involving unreachable nodes?
+                if (sourceNode.userData.majorLayerIndex === defaultMajorLayerIndex || targetNode.userData.majorLayerIndex === defaultMajorLayerIndex) {
+                    dynamicMaterial.color.setHex(0xff0000); // e.g., red
+                    dynamicMaterial.opacity = 0.1;
+                }
+
+                const line = new THREE.Line(geometry, dynamicMaterial);
+                // Store references for updating link geometry if nodes move
+                line.userData = { 
+                    sourceId: linkData.source, 
+                    targetId: linkData.target,
+                    originalData: linkData // Store original link data if needed
+                }; 
+                linkGroup.add(line);
+                linkMeshes.push(line);
+            } else {
+                 console.warn(`Could not create link, missing node for: ${linkData.source} -> ${linkData.target}`);
+            }
+        });
+
+        // --- Camera & Initial View ---
+        // Adjust camera for planar view - look slightly down from above/side
+        camera.position.x = dataPlaneSize * 0.8 + uiPlaneXOffset; // Center view between data and UI planes
+        camera.position.y = -dataPlaneSize * 0.9; // Look from slightly below Y=0 plane
+        // Adjust Z based on the actual maxLayer used for positioning
+        camera.position.z = -250; // Position back along negative Z axis to view Layer 0 in front
+        camera.lookAt(0, 0, 0); // Look towards the Z=0 plane
+        controls.target.set(0, 0, 0); // Target the Z=0 plane
+
+        // --- Node Info Panel ---
+        const nodeInfoPanel = document.getElementById('node-info');
+        const nodeTitle = document.getElementById('node-title');
+        const nodeDescription = document.getElementById('node-description');
+        const nodeCodes = document.getElementById('node-codes');
+
+        function showNodeInfo(nodeMesh) {
+            const d = nodeMesh.userData;
+            nodeTitle.textContent = d.label;
+            nodeDescription.textContent = d.description || "No description available.";
+            let codesText = "";
+            if (d.snomed) codesText += `SNOMED: ${d.snomed} `;
+            if (d.icd10) codesText += `ICD-10: ${d.icd10}`;
+            nodeCodes.textContent = codesText.trim() ? `Codes: ${codesText}` : "";
+            nodeInfoPanel.style.display = 'block';
+        }
+
+        function hideNodeInfo() {
+            nodeInfoPanel.style.display = 'none';
+        }
+
+        // --- Interaction (Raycasting) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let intersectedObject = null;
+        // REMOVED highlightedUiLabel variable
+
+        function onPointerMove(event) {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the picking ray with the camera and mouse position
+            raycaster.setFromCamera(mouse, camera);
+
+            // Calculate objects intersecting the picking ray
+            const intersects = raycaster.intersectObjects(nodeGroup.children); // Check only nodes
+
+            if (intersects.length > 0) {
+                if (intersectedObject !== intersects[0].object) {
+                     // Clear previous node highlight
+                     if (intersectedObject) {
+                         intersectedObject.material.emissive.setHex(0x000000); 
+                         // Label highlighting logic removed
+                     }
+                    
+                    intersectedObject = intersects[0].object;
+                    // Highlight intersected node - simple emissive highlight
+                    intersectedObject.material.emissive.setHex(0x333333);
+                    showNodeInfo(intersectedObject);
+                    document.body.style.cursor = 'pointer';
+
+                    // REMOVED UI section label highlight logic
+                }
+            } else {
+                 // Clear previous node highlight
+                 if (intersectedObject) {
+                    intersectedObject.material.emissive.setHex(0x000000);
+                    // Label highlighting logic removed
+                 }
+                intersectedObject = null;
+                hideNodeInfo();
+                document.body.style.cursor = 'auto';
+            }
+        }
+
+        window.addEventListener('pointermove', onPointerMove);
+
+        // --- Resize Handling ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            css2DRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Required if damping enabled
+
+            updateParticles(); // *** ADDED THIS CALL ***
+
+            // --- Dynamic Label Styling for Occlusion Effect ---
+            const cameraZ = camera.position.z;
+            labelGroup.children.forEach(label => {
+                if (label.userData.nodeId) { // Only process node labels
+                    const node = nodeObjects.get(label.userData.nodeId);
+                    const div = label.element;
+                    if (node && div) {
+                        const labelZ = label.position.z;
+                        const isActive = node.userData.isActive;
+                        let isOccluded = false;
+
+                        // Base style based on activity
+                        let targetOpacity = isActive ? 1.0 : inactiveOpacity + 0.2;
+                        let targetColor = isActive ? '#fff' : '#777';
+
+                        // Check occlusion by visible data planes
+                        layerVizGroup.children.forEach(plane => {
+                            if (plane.visible) {
+                                const planeZ = plane.position.z;
+                                // Check if plane is between camera and label along Z
+                                if ((cameraZ > planeZ && planeZ > labelZ) || (cameraZ < planeZ && planeZ < labelZ)) {
+                                    isOccluded = true;
+                                }
+                            }
+                        });
+                        
+                        // Check occlusion by visible UI planes
+                        if (!isOccluded) { // Only check UI planes if not already occluded by data plane
+                            uiPlaneGroup.children.forEach(uiPlane => {
+                                if (uiPlane.visible) {
+                                    const uiPlaneZ = uiPlane.position.z;
+                                     if ((cameraZ > uiPlaneZ && uiPlaneZ > labelZ) || (cameraZ < uiPlaneZ && uiPlaneZ < labelZ)) {
+                                        isOccluded = true;
+                                    }
+                                }
+                            });
+                        }
+
+                        // Apply occlusion effect if needed
+                        if (isOccluded) {
+                            targetOpacity *= 0.6; // Dim further if occluded (adjust factor as needed)
+                        }
+
+                        // Apply final styles
+                        div.style.opacity = targetOpacity;
+                        div.style.color = targetColor;
+                    }
+                }
+            });
+            // --- End Dynamic Label Styling ---
+
+            // Update label positions if nodes move (although they don't currently)
+            // This is more robust if you add forces or dragging later
+            /*
+            labelGroup.children.forEach(label => {
+                const node = nodeObjects.get(label.userData.nodeId);
+                if (node) {
+                    const labelOffset = (node.userData.size || 1) * baseNodeScale * 1.2; 
+                    label.position.set(node.position.x, node.position.y + labelOffset, node.position.z);
+                }
+            });
+            */
+
+            renderer.render(scene, camera);
+            css2DRenderer.render(scene, camera); // Render CSS labels
+        }
+
+        // Separate Animation Loop for Physics/Particles if needed, or integrate
+        function updateParticles() {
+            // 1. Emit New Particles
+            if (activeParticles.length < MAX_PARTICLES) {
+                linkGroup.children.forEach(linkMesh => {
+                    // Check visibility AND active status from userData
+                    if (!linkMesh.visible || !linkMesh.userData?.isActive) return; // Check both!
+
+                    const linkData = linkMesh.userData.originalData;
+                    const sourceNode = nodeObjects.get(linkMesh.userData.sourceId);
+                    const targetNode = nodeObjects.get(linkMesh.userData.targetId);
+
+                    if (sourceNode && targetNode && linkData) { // Check linkData exists
+                        const currentParticlesOnLink = activeParticles.filter(p => p.link === linkMesh).length;
+                        if (currentParticlesOnLink >= maxParticlesPerLink) return;
+
+                        // Using evidence for now:
+                        const evidenceFactor = (linkData.evidence || 0) / 100;
+                        const emissionChance = particleBaseEmissionRate + evidenceFactor * 0.05; // Higher evidence = higher chance
+
+                        if (Math.random() < emissionChance) {
+                            const speed = particleBaseSpeed * (0.8 + Math.random() * 0.4);
+                            // Particle color based on source node
+                            const color = sourceNode.material.color.clone(); 
+
+                            activeParticles.push({
+                                link: linkMesh,
+                                progress: 0, // Start at source
+                                speed: speed, // Store speed
+                                color: color, // Store color
+                                id: Math.random() // Simple ID
+                            });
+                        }
+                    }
+                });
+            }
+
+            // 2. Update Existing Particles & Geometry Buffers
+            const nextActiveParticles = [];
+            let particleIndex = 0;
+
+            activeParticles.forEach(particle => {
+                // Check link visibility AND active status again before updating/drawing
+                if (!particle.link.visible || !particle.link.userData?.isActive) { // Check both!
+                    return; // Skip particle if link becomes inactive/invisible
+                }
+
+                // Get current source and target positions from the Line geometry
+                const positions = particle.link.geometry.attributes.position.array;
+                const sourceVec = new THREE.Vector3().fromArray(positions, 0); // Read first point
+                const targetVec = new THREE.Vector3().fromArray(positions, 3); // Read second point
+                const linkLength = sourceVec.distanceTo(targetVec);
+
+                if (linkLength > 0.1) {
+                    const travel = particle.speed / linkLength; // Use particle's stored speed
+                    particle.progress += travel;
+             } else {
+                    particle.progress = 1; // Link too short, consider it done
+                }
+
+                // If particle hasn't reached end and we haven't hit the buffer limit
+                if (particle.progress < 1 && particleIndex < MAX_PARTICLES) {
+                    // Calculate current interpolated position
+                    const currentPos = new THREE.Vector3().lerpVectors(sourceVec, targetVec, particle.progress);
+
+                    // --- Update Buffers ---
+                    // Position
+                    particlePositions[particleIndex * 3] = currentPos.x;
+                    particlePositions[particleIndex * 3 + 1] = currentPos.y;
+                    particlePositions[particleIndex * 3 + 2] = currentPos.z;
+
+                    // Color
+                    particleColors[particleIndex * 3] = particle.color.r;
+                    particleColors[particleIndex * 3 + 1] = particle.color.g;
+                    particleColors[particleIndex * 3 + 2] = particle.color.b;
+                    // --- End Buffer Update ---
+
+                    nextActiveParticles.push(particle); // Keep particle for next frame
+                    particleIndex++; // Increment buffer index
+                } // else: particle is done or buffer full, effectively removed by not adding to nextActiveParticles
+            });
+
+            activeParticles = nextActiveParticles; // Update the active particle list
+
+            // 3. Update Three.js Points Geometry attributes
+            particleGeometry.attributes.position.needsUpdate = true;
+            particleGeometry.attributes.color.needsUpdate = true;
+            particleGeometry.setDrawRange(0, activeParticles.length); // Only draw active particles
+            particleGeometry.computeBoundingSphere(); // Important for frustum culling
+        }
+
+        // --- Reachability Function (used by evidence filter) ---
+        function findReachableNodes(startNodeId, threshold) {
+            const reachable = new Set([startNodeId]);
+            const queue = [startNodeId];
+            const visited = new Set([startNodeId]);
+
+            while (queue.length > 0) {
+                const currentId = queue.shift();
+                const neighbors = adjacencyList.get(currentId) || [];
+
+                neighbors.forEach(linkInfo => {
+                    const neighborId = linkInfo.target;
+                    // Check link evidence against threshold
+                    if ((linkInfo.evidence || 0) >= threshold && !visited.has(neighborId)) {
+                        visited.add(neighborId);
+                        reachable.add(neighborId);
+                        queue.push(neighborId);
+                    }
+                });
+            }
+            return reachable;
+        }
+
+        function updateAppearanceBasedOnEvidence(threshold) {
+            currentEvidenceThreshold = threshold;
+            const reachableNodes = findReachableNodes('PE', threshold);
+
+            // Update Nodes
+            nodeGroup.children.forEach(nodeMesh => {
+                const isActive = reachableNodes.has(nodeMesh.userData.id);
+                nodeMesh.userData.isActive = isActive; // Store state
+                nodeMesh.material.opacity = isActive ? 1.0 : inactiveOpacity;
+                nodeMesh.material.color = isActive ? new THREE.Color(nodeMesh.userData.color) : inactiveColor;
+                nodeMesh.material.transparent = !isActive; // Enable transparency if inactive
+                nodeMesh.material.needsUpdate = true;
+                // Actual visibility depends on layer toggle AND active state
+                const layerIndex = nodeMesh.userData.majorLayerIndex;
+                const layerVisible = layerStates.get(layerIndex);
+                nodeMesh.visible = layerVisible && isActive;
+            });
+
+            // Update Links
+            linkGroup.children.forEach(line => {
+                const sourceNode = nodeObjects.get(line.userData.sourceId);
+                const targetNode = nodeObjects.get(line.userData.targetId);
+                const linkData = line.userData.originalData;
+                let isActive = false;
+                if (sourceNode && targetNode && linkData) {
+                    isActive = (linkData.evidence || 0) >= threshold &&
+                                 reachableNodes.has(sourceNode.userData.id) &&
+                                 reachableNodes.has(targetNode.userData.id);
+                }
+                line.userData.isActive = isActive; // Store state
+                line.material.opacity = isActive ? (0.1 + (linkData.evidence / 100) * 0.5) : inactiveOpacity * 0.5;
+                line.material.transparent = true; // Always transparent for links
+                 // Actual visibility depends on connected layer visibility AND active state
+                 const sourceLayerVisible = layerStates.get(sourceNode?.userData.majorLayerIndex);
+                 const targetLayerVisible = layerStates.get(targetNode?.userData.majorLayerIndex);
+                 line.visible = sourceLayerVisible && targetLayerVisible && isActive;
+            });
+
+            // Update Node Labels visibility based on activity and layer label state
+            updateAllNodeLabelVisibilities(); // Call the function that updates all labels
+
+            // ADDED: Update the UI highlight overlay based on potentially changed active layer
+            updateHighlightOverlay(); // Call without arguments
+        }
+
+        // --- Spacing Slider Logic ---
+        const spacingSlider = document.getElementById('spacingSlider');
+        const spacingValueDisplay = document.getElementById('spacingValue');
+
+        // --- Layer States & Menu Logic ---
+        const menuContainer = document.getElementById('layer-menu');
+        let nodeLabelCheckbox; // Declare variable, assign later
+        const evidenceSlider = document.getElementById('evidenceSlider');
+        const evidenceValueDisplay = document.getElementById('evidenceValue');
+
+        // Keep track of layer visibility states
+        const layerStates = new Map();
+        const layerLabelStates = new Map(); // ADDED: For per-layer label visibility
+        majorLayerDefinitions.forEach(def => {
+            layerStates.set(def.index, true);
+            layerLabelStates.set(def.index, true); // Initialize labels as visible
+        });
+        if (nodesByMajorLayerThenGroup.has(defaultMajorLayerIndex)) {
+             layerStates.set(defaultMajorLayerIndex, true);
+             layerLabelStates.set(defaultMajorLayerIndex, true); // Initialize labels as visible
+        }
+
+        function findActiveHighlightLayer() {
+            let activeLayerIndex = -1;
+            // Find the HIGHEST index layer that is currently visible and has a highlight key
+            // Loop downwards from maxLayer
+            for (let i = maxLayer; i >= 0; i--) { 
+                const layerDef = majorLayerDefinitions.find(def => def.index === i);
+                // Check visibility, if highlight key exists, AND if any nodes on layer are visible
+                if (layerStates.get(i) && layerDef?.uiMappings) { 
+                    const nodesOnLayer = Array.from(nodeObjects.values()).filter(n => n.userData.majorLayerIndex === i);
+                    const anyNodeVisible = nodesOnLayer.some(n => n.visible);
+                    if (anyNodeVisible) {
+                         activeLayerIndex = i;
+                         break; // Found the highest active layer meeting criteria
+                    }
+                }
+            }
+            // Optional: Consider default layer if no others are active?
+            // if (activeLayerIndex === -1 && layerStates.get(defaultMajorLayerIndex)) { ... }
+            return activeLayerIndex;
+        }
+
+        // Function to toggle layer visibility
+        function setLayerVisibility(layerIndex, isVisible) {
+            layerStates.set(layerIndex, isVisible); // Update layer state
+
+            // Toggle Plane and Plane Label
+            const visuals = layerVisuals.get(layerIndex);
+            if (visuals) {
+                if (visuals.plane) visuals.plane.visible = isVisible;
+                if (visuals.planeLabel) visuals.planeLabel.visible = isVisible; // Toggle CSS2D label
+                if (visuals.connectorLine) visuals.connectorLine.visible = isVisible; // ADDED: Toggle connector line
+                if (visuals.uiPlane) {
+                    visuals.uiPlane.visible = isVisible; // Toggle UI plane too
+                }
+            }
+
+            // Toggle Nodes on this layer (respecting evidence filter)
+            nodeGroup.children.forEach(nodeMesh => {
+                if (nodeMesh.userData.majorLayerIndex === layerIndex) {
+                    // Node visible only if layer is visible AND node is active based on evidence
+                    nodeMesh.visible = isVisible && nodeMesh.userData.isActive;
+                }
+            });
+
+            // Update Node Labels visibility based on NEW layer visibility and existing label state
+            setNodeLabelVisibilityForLayer(layerIndex, layerLabelStates.get(layerIndex)); 
+
+            // Update link visibility based on *all* layer states
+            linkGroup.children.forEach(line => {
+                const sourceNode = nodeObjects.get(line.userData.sourceId);
+                const targetNode = nodeObjects.get(line.userData.targetId);
+                if (sourceNode && targetNode) {
+                    const sourceLayerVisible = layerStates.get(sourceNode.userData.majorLayerIndex);
+                    const targetLayerVisible = layerStates.get(targetNode.userData.majorLayerIndex);
+                    // Visible if link is active AND BOTH connected layers are set to visible
+                    line.visible = line.userData.isActive && sourceLayerVisible && targetLayerVisible;
+                }
+            });
+
+        }
+
+        // Function to update spacing
+        function updateLayerSpacing(newSpacing) {
+            currentLayerZSpacing = newSpacing;
+            spacingValueDisplay.textContent = newSpacing;
+
+            // Update Nodes Z position
+            nodeGroup.children.forEach(nodeMesh => {
+                const layerIndex = nodeMesh.userData.majorLayerIndex;
+                nodeMesh.position.z = layerIndex * currentLayerZSpacing;
+                 // Also update cluster center if needed, though nodes are positioned relative
+            });
+
+            // Update Labels (Nodes and Planes) Z position
+            labelGroup.children.forEach(label => {
+                let originalX = label.position.x;
+                let originalY = label.position.y; 
+                if (label.userData.nodeId) { // Node Label
+                    const node = nodeObjects.get(label.userData.nodeId);
+                    if (node) {
+                         const layerIndex = node.userData.majorLayerIndex;
+                         const labelOffset = (node.userData.size || 1) * baseNodeScale * 1.2;
+                         // Find node's current XY to calculate label's Y relative to it 
+                        // This requires knowing the cluster layout calculation again, or storing initial relative Y
+                         // Simpler approach for now: Only update Z, assume XY layout on plane is static
+                        originalY = node.position.y + labelOffset; // Use node's *current* Y + offset
+                        label.position.set(originalX, originalY, layerIndex * currentLayerZSpacing);
+                    }
+                } else if (label.userData.planeLayerIndex !== undefined) { // Plane Label
+                    const layerIndex = label.userData.planeLayerIndex;
+                     // Keep X/Y from initial placement, only update Z
+                    label.position.set(originalX, originalY, (layerIndex * currentLayerZSpacing) + 0.1);
+                }
+            });
+
+            // Update Planes Z position
+            layerVizGroup.children.forEach(planeMesh => {
+                const layerIndex = planeMesh.userData.majorLayerIndex;
+                planeMesh.position.z = layerIndex * currentLayerZSpacing;
+            });
+            // ADDED: Update UI Planes Z position
+            uiPlaneGroup.children.forEach(uiPlaneMesh => {
+                 const layerIndex = uiPlaneMesh.userData.majorLayerIndex;
+                 uiPlaneMesh.position.z = layerIndex * currentLayerZSpacing;
+            });
+
+            // Update Link Geometry (Important!)
+            linkMeshes.forEach(line => {
+                 const sourceNode = nodeObjects.get(line.userData.sourceId);
+                 const targetNode = nodeObjects.get(line.userData.targetId);
+                 if(sourceNode && targetNode) {
+                     const positions = line.geometry.attributes.position;
+                     positions.setXYZ(0, sourceNode.position.x, sourceNode.position.y, sourceNode.position.z);
+                     positions.setXYZ(1, targetNode.position.x, targetNode.position.y, targetNode.position.z);
+                     positions.needsUpdate = true; // Crucial for line updates
+                     line.geometry.computeBoundingSphere(); // Update bounding sphere for raycasting if needed
+                 }
+            });
+
+            // Update Connector Lines Z Position
+            connectorLineGroup.children.forEach(line => {
+                const layerIndex = line.userData.layerIndex;
+                const layerZ = layerIndex * currentLayerZSpacing;
+                const positions = line.geometry.attributes.position;
+                // Update Z for all 3 points
+                positions.setZ(0, layerZ + 0.05);
+                positions.setZ(1, layerZ + 0.05);
+                positions.setZ(2, layerZ + 0.05);
+                positions.needsUpdate = true;
+                line.geometry.computeBoundingSphere();
+            });
+
+            // Update Camera Target Z
+            // controls.target.set(0, 0, (maxLayer / 2) * currentLayerZSpacing);
+            controls.target.z = (maxLayer / 2) * currentLayerZSpacing; // Update only Z target
+            controls.update(); // Apply target change immediately
+        }
+
+        // --- Populate Menu & Add Event Listeners ---
+
+        // Layer Toggles (Populate after other controls)
+        majorLayerDefinitions.forEach(layerDef => {
+            const layerIndex = layerDef.index;
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('layer-menu-item'); // ADD class for styling
+            menuItem.style.marginBottom = '6px'; // Keep spacing
+
+            // Container for Layer Toggle
+            const layerToggleContainer = document.createElement('span');
+            layerToggleContainer.classList.add('layer-toggle-group'); // ADD class
+
+            const layerCheckbox = document.createElement('input');
+            layerCheckbox.type = 'checkbox';
+            layerCheckbox.id = `layer-toggle-${layerIndex}`;
+            layerCheckbox.value = layerIndex;
+            layerCheckbox.checked = true;
+            const layerLabel = document.createElement('label');
+            layerLabel.htmlFor = layerCheckbox.id;
+            let labelText = layerDef.groups.join(', ');
+            if (labelText.length > 25) labelText = labelText.substring(0, 22) + '...';
+            layerLabel.textContent = ` L${layerIndex}: ${labelText}`;
+            layerCheckbox.addEventListener('change', (event) => {
+                setLayerVisibility(layerIndex, event.target.checked);
+            });
+            layerToggleContainer.appendChild(layerCheckbox);
+            layerToggleContainer.appendChild(layerLabel);
+            menuItem.appendChild(layerToggleContainer); // Add container to menu item
+
+            // Container for Label Toggle
+            const labelToggleContainer = document.createElement('span');
+            labelToggleContainer.classList.add('label-toggle-group'); // ADD class
+
+            const labelCheckbox = document.createElement('input');
+            labelCheckbox.type = 'checkbox';
+            labelCheckbox.id = `node-label-toggle-${layerIndex}`;
+            labelCheckbox.value = layerIndex;
+            labelCheckbox.checked = true;
+            // labelCheckbox.style.marginLeft = '10px'; // Remove margin, handle with flex
+            const labelLabel = document.createElement('label');
+            labelLabel.htmlFor = labelCheckbox.id;
+            labelLabel.textContent = `Labels`;
+            labelLabel.style.fontSize = '10px'; 
+
+            labelCheckbox.addEventListener('change', (event) => {
+                const showNodeLabels = event.target.checked;
+                setNodeLabelVisibilityForLayer(layerIndex, showNodeLabels);
+                // ADDED: Uncheck master if any individual layer is unchecked
+                if (!showNodeLabels) {
+                    const masterCheck = document.getElementById('master-label-toggle');
+                    if (masterCheck) masterCheck.checked = false;
+                }
+            });
+            labelToggleContainer.appendChild(labelCheckbox);
+            labelToggleContainer.appendChild(labelLabel);
+            menuItem.appendChild(labelToggleContainer); // Add container to menu item
+
+            menuContainer.appendChild(menuItem);
+        });
+
+        // Default Layer Toggle (Apply similar structure)
+        if (nodesByMajorLayerThenGroup.has(defaultMajorLayerIndex)) {
+            const layerIndex = defaultMajorLayerIndex;
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('layer-menu-item'); // ADD class
+            menuItem.style.marginBottom = '6px';
+
+            // Container for Layer Toggle
+            const layerToggleContainer = document.createElement('span');
+            layerToggleContainer.classList.add('layer-toggle-group'); // ADD class
+
+            const layerCheckbox = document.createElement('input');
+            layerCheckbox.type = 'checkbox';
+            layerCheckbox.id = `layer-toggle-${layerIndex}`;
+            layerCheckbox.value = layerIndex;
+            layerCheckbox.checked = true;
+            const layerLabel = document.createElement('label');
+            layerLabel.htmlFor = layerCheckbox.id;
+            layerLabel.textContent = ` Default/Unmapped`;
+            layerCheckbox.addEventListener('change', (event) => {
+                setLayerVisibility(layerIndex, event.target.checked);
+            });
+            layerToggleContainer.appendChild(layerCheckbox);
+            layerToggleContainer.appendChild(layerLabel);
+            menuItem.appendChild(layerToggleContainer);
+
+            // Container for Label Toggle
+            const labelToggleContainer = document.createElement('span');
+            labelToggleContainer.classList.add('label-toggle-group'); // ADD class
+
+            const labelCheckbox = document.createElement('input');
+            labelCheckbox.type = 'checkbox';
+            labelCheckbox.id = `node-label-toggle-${layerIndex}`;
+            labelCheckbox.value = layerIndex;
+            labelCheckbox.checked = true;
+            // labelCheckbox.style.marginLeft = '10px'; // Remove margin
+            const labelLabel = document.createElement('label');
+            labelLabel.htmlFor = labelCheckbox.id;
+            labelLabel.textContent = `Labels`;
+            labelLabel.style.fontSize = '10px';
+            labelCheckbox.addEventListener('change', (event) => {
+                 const showNodeLabels = event.target.checked;
+                 setNodeLabelVisibilityForLayer(layerIndex, showNodeLabels);
+                 // ADDED: Uncheck master if any individual layer is unchecked
+                 if (!showNodeLabels) {
+                    const masterCheck = document.getElementById('master-label-toggle');
+                    if (masterCheck) masterCheck.checked = false;
+                 }
+            });
+            labelToggleContainer.appendChild(labelCheckbox);
+            labelToggleContainer.appendChild(labelLabel);
+            menuItem.appendChild(labelToggleContainer);
+            
+            menuContainer.appendChild(menuItem);
+        }
+
+        // --- ADD Master Label Toggle ---
+        const masterToggleDiv = document.createElement('div');
+        masterToggleDiv.style.marginTop = '15px';
+        masterToggleDiv.style.paddingTop = '8px';
+        masterToggleDiv.style.borderTop = '1px solid #444';
+
+        const masterCheckbox = document.createElement('input');
+        masterCheckbox.type = 'checkbox';
+        masterCheckbox.id = 'master-label-toggle';
+        masterCheckbox.checked = true; // Start checked
+
+        const masterLabel = document.createElement('label');
+        masterLabel.htmlFor = 'master-label-toggle';
+        masterLabel.textContent = ' All Node Labels';
+        masterLabel.style.fontWeight = 'bold';
+
+        masterCheckbox.addEventListener('change', (event) => {
+            const masterIsChecked = event.target.checked;
+            layerLabelStates.forEach((_, layerIndex) => {
+                // Update state map
+                layerLabelStates.set(layerIndex, masterIsChecked);
+                // Update individual checkboxes
+                const perLayerCheckbox = document.getElementById(`node-label-toggle-${layerIndex}`);
+                if (perLayerCheckbox) {
+                    perLayerCheckbox.checked = masterIsChecked;
+                }
+            });
+            // Update actual label visibility (function to be added/called)
+            updateAllNodeLabelVisibilities(); 
+        });
+
+        masterToggleDiv.appendChild(masterCheckbox);
+        masterToggleDiv.appendChild(masterLabel);
+        menuContainer.appendChild(masterToggleDiv);
+        // --- END Master Label Toggle ---
+
+        // Spacing Slider Listener
+        spacingSlider.addEventListener('input', (event) => {
+            updateLayerSpacing(parseInt(event.target.value));
+        });
+
+        // Evidence Slider Listener
+        evidenceSlider.addEventListener('input', (event) => {
+            const threshold = parseInt(event.target.value);
+            evidenceValueDisplay.textContent = threshold + '%';
+            updateAppearanceBasedOnEvidence(threshold);
+        });
+
+        // --- Start ---
+        // Initial visibility setup based on threshold
+        updateAppearanceBasedOnEvidence(currentEvidenceThreshold);
+        // Initial highlight setup 
+        updateHighlightOverlay(); // Call without arguments
+        animate();
+
+        // --- Helper Function to Create UI Texture ---
+        // Takes an array of highlightKeys
+        function createClinicalNoteTexture(highlightKeys = [], highlightColor = null) { 
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 512; // Texture size
+            canvas.width = size;
+            canvas.height = size;
+            const bounds = {}; // Store bounding boxes { x, y, width, height } in relative coords (0-1)
+            const defaultBgColor = '#2a2a3a';
+            const outlineColor = '#cccccc';
+            const textColor = '#dddddd';
+
+            // Define Layout Structure (relative coordinates)
+            const margin = 0.04;
+            const colWidth = (1.0 - 3 * margin) / 2;
+            const rowHeight = (1.0 - 4 * margin) / 3;
+            const x1 = margin;
+            const x2 = margin * 2 + colWidth;
+            const y1 = margin;
+            const y2 = margin * 2 + rowHeight;
+            const y3 = margin * 3 + rowHeight * 2;
+            const w1 = colWidth;
+            const h1 = rowHeight;
+            const wFull = 1.0 - 2 * margin;
+            const rosWidth = w1 * 0.6;
+            const examLabsX = x1 + rosWidth + margin / 2; // Small gap
+            const examLabsWidth = w1 - rosWidth - margin / 2;
+
+            const uiSectionLayout = {
+                'HPI':      { x: x1, y: y1, w: wFull, h: h1 },
+                'PMHx':     { x: x1, y: y2, w: w1, h: h1 },
+                'SHx':      { x: x2, y: y2, w: w1, h: h1 },
+                'ROS':      { x: x1, y: y3, w: rosWidth, h: h1 },
+                'ExamLabs': { x: examLabsX, y: y3, w: examLabsWidth, h: h1 },
+                'AP':       { x: x2, y: y3, w: w1, h: h1 },
+            };
+
+            // 1. Draw overall background
+            ctx.fillStyle = defaultBgColor;
+            ctx.fillRect(0, 0, size, size);
+
+            // 2. Draw section backgrounds and outlines
+            Object.entries(uiSectionLayout).forEach(([key, layout]) => {
+                const absX = layout.x * size;
+                const absY = layout.y * size;
+                const absW = layout.w * size;
+                const absH = layout.h * size;
+
+                // Determine background color for this section
+                let sectionBgColor = defaultBgColor;
+                // Check if the current section key is in the highlightKeys array
+                if (highlightKeys && highlightKeys.includes(key) && highlightColor) {
+                    // Convert THREE.Color if necessary, provide fallback
+                    sectionBgColor = highlightColor instanceof THREE.Color 
+                        ? `rgba(${Math.round(highlightColor.r*255)}, ${Math.round(highlightColor.g*255)}, ${Math.round(highlightColor.b*255)}, 0.6)` // Semi-transparent highlight
+                        : (typeof highlightColor === 'string' ? highlightColor : 'rgba(255, 255, 0, 0.5)'); 
+                }
+                
+                // Draw Background
+                ctx.fillStyle = sectionBgColor;
+                ctx.fillRect(absX, absY, absW, absH);
+
+                // Draw Outline
+                ctx.strokeStyle = outlineColor;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(absX, absY, absW, absH);
+
+                // Store relative bounds for potential future use (though text uses absolute)
+                bounds[key] = layout; 
+            });
+
+            // 3. Draw text labels (after backgrounds and outlines)
+            ctx.fillStyle = textColor; 
+            ctx.font = 'bold 16px sans-serif'; 
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            Object.entries(uiSectionLayout).forEach(([key, layout]) => {
+                const centerX = (layout.x + layout.w / 2) * size;
+                // Calculate Y position near the top of the section again
+                const textY = (layout.y * size) + (0.15 * layout.h * size); 
+                
+                // Apply horizontal flip for correct viewing from Layer 0
+                ctx.save(); 
+                ctx.translate(centerX, textY); // Move origin to text position
+                ctx.scale(-1, 1); // Flip horizontally
+                ctx.fillText(key, 0, 0); // Draw text at the transformed origin
+                ctx.restore(); 
+            });
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            // Return texture directly, bounds are internal now
+            return texture; 
+        }
+
+        // --- Highlight Overlay Logic --- 
+        function updateHighlightOverlay() { 
+            layerVisuals.forEach((visuals, layerIndex) => {
+                if (visuals.uiPlane && visuals.uiMaterial && visuals.defaultTexture) {
+                    const material = visuals.uiMaterial;
+                    const currentTexture = material.map;
+                    const defaultTexture = visuals.defaultTexture;
+                    let newTexture = defaultTexture; 
+                    const isVisible = layerStates.get(layerIndex); 
+
+                    // Find relevant UI mappings from VISIBLE nodes on this layer
+                    const visibleNodesOnLayer = Array.from(nodeObjects.values())
+                        .filter(node => node.userData.majorLayerIndex === layerIndex && node.visible);
+                    
+                    const combinedMappings = new Set();
+                    visibleNodesOnLayer.forEach(node => {
+                        if (node.userData.uiMappings) {
+                            node.userData.uiMappings.forEach(mapping => combinedMappings.add(mapping));
+                        }
+                    });
+                    const highlightKeys = Array.from(combinedMappings);
+                    
+                    // Highlight if layer is visible AND there are mappings from visible nodes
+                    if (isVisible && highlightKeys.length > 0) { 
+                        const planeColor = visuals.plane.material.color; // Use data plane color
+                        newTexture = createClinicalNoteTexture(highlightKeys, planeColor); // Pass combined list
+                    } 
+                    
+                    // Apply new texture if it's different from the current one
+                    if (material.map !== newTexture) {
+                        material.map = newTexture;
+                        material.needsUpdate = true;
+                        if (currentTexture && currentTexture !== defaultTexture && currentTexture !== newTexture) { 
+                            currentTexture.dispose();
+                        }
+                    }
+                }
+            });
+        }
+        
+        // --- Start ---
+        // Initial visibility setup based on threshold
+        updateAppearanceBasedOnEvidence(currentEvidenceThreshold);
+        // Initial highlight setup 
+        updateHighlightOverlay(); // Call without arguments
+        animate();
+
+        // ADDED: Function to specifically toggle node labels for a given layer
+        function setNodeLabelVisibilityForLayer(layerIndex, showLabels) {
+            layerLabelStates.set(layerIndex, showLabels); // Update state
+
+            labelGroup.children.forEach(label => {
+                if (label.userData.nodeId) { // Check if it's a node label
+                    const node = nodeObjects.get(label.userData.nodeId);
+                    if (node && node.userData.majorLayerIndex === layerIndex) {
+                        // Visible if: layer labels are on AND node is active AND layer itself is visible
+                        label.visible = showLabels && node.userData.isActive && layerStates.get(layerIndex);
+                    }
+                }
+            });
+        }
+
+        // ADDED: Function to update visibility of ALL node labels based on layerLabelStates
+        function updateAllNodeLabelVisibilities() {
+            labelGroup.children.forEach(label => {
+                if (label.userData.nodeId) { // Check if it's a node label
+                    const node = nodeObjects.get(label.userData.nodeId);
+                    if (node) {
+                        const layerIndex = node.userData.majorLayerIndex;
+                        const showLabels = layerLabelStates.get(layerIndex); // Check this layer's label state
+                        // Visible if: layer labels are on AND node is active AND layer itself is visible
+                        label.visible = showLabels && node.userData.isActive && layerStates.get(layerIndex);
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html> 

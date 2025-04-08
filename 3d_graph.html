@@ -74,6 +74,7 @@
             font-size: 12px;
             border-bottom: 1px solid #444;
             padding-bottom: 4px;
+            display: inline-block; /* Align title and button */
         }
         #layer-menu div {
             margin-bottom: 4px;
@@ -249,13 +250,82 @@
              border: none;
          }
         /* --- End Custom Slider Styling --- */
+
+        /* --- NEW: Menu Toggle Button Styling --- */
+        #menu-toggle-button {
+            background: none;
+            border: 1px solid #555;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-left: 10px;
+            vertical-align: middle;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        #menu-toggle-button:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* --- NEW: Menu Hidden State --- */
+        #layer-menu.menu-hidden > *:not(h4):not(#menu-toggle-button) {
+            display: none; /* Hide all direct children except title and button */
+        }
+        #layer-menu.menu-hidden {
+            max-height: 35px; /* Adjust to fit title and button */
+            overflow: hidden; /* Hide scrollbar */
+        }
+        #layer-menu {
+            /* Add transition for smooth hide/show */
+            transition: max-height 0.3s ease-in-out;
+        }
+        /* --- End Menu Toggle Styling --- */
+
+        #layer-menu input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        /* --- ADDED: Instructions Panel Styling --- */
+        #instructions-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 10px;
+            color: #ccc;
+            line-height: 1.4;
+            max-width: 180px; /* Limit width */
+            pointer-events: none; /* Allow clicks to pass through */
+            user-select: none; /* Prevent text selection */
+        }
+        #instructions-panel strong {
+            color: #fff;
+        }
+
+        /* --- Slider Thumb (Chrome, Safari, Edge, Opera) --- */
+        #layer-menu input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            background: #0af; /* Bright blue thumb */
+            border: 1px solid #0df; /* Brighter border */
+            border-radius: 50%; /* Make it round */
+            cursor: pointer;
+            margin-top: -3.5px; /* Adjust vertical position */
+        }
     </style>
 </head>
 <body>
     <div id="canvas-container"></div>
     <!-- REMOVE Legend Container -->
     <div id="layer-menu">
-        <h4>Toggle Layers</h4>
+        <h4>Toggle Layers</h4><button id="menu-toggle-button">Hide</button> <!-- ADDED Toggle Button -->
         <!-- Spacing Control -->
         <div class="spacing-control">
             <label for="spacingSlider">Layer Spacing:</label>
@@ -274,6 +344,14 @@
         <h3 id="node-title">Node Title</h3>
         <p id="node-description">Node description will appear here.</p>
         <p id="node-codes" style="font-size: 11px; color: #aaa;"></p>
+    </div>
+
+    <!-- ADDED: Instructions Panel -->
+    <div id="instructions-panel">
+        <strong>Controls:</strong><br>
+        Rotate: Drag / Touch-Drag (1 finger)<br>
+        Zoom: Scroll / Pinch<br>
+        Pan: Right-Click Drag / Touch-Drag (2 fingers)
     </div>
 
     <!-- Import Three.js -->
@@ -994,12 +1072,20 @@
 
         // --- Camera & Initial View ---
         // Adjust camera for planar view - look slightly down from above/side
-        camera.position.x = dataPlaneSize * 0.8 + uiPlaneXOffset; // Center view between data and UI planes
-        camera.position.y = -dataPlaneSize * 0.9; // Look from slightly below Y=0 plane
-        // Adjust Z based on the actual maxLayer used for positioning
-        camera.position.z = -250; // Position back along negative Z axis to view Layer 0 in front
-        camera.lookAt(0, 0, 0); // Look towards the Z=0 plane
-        controls.target.set(0, 0, 0); // Target the Z=0 plane
+        // camera.position.x = dataPlaneSize * 0.8 + uiPlaneXOffset; // Center view between data and UI planes
+        // camera.position.y = -dataPlaneSize * 0.9; // Look from slightly below Y=0 plane
+        // // Adjust Z based on the actual maxLayer used for positioning
+        // camera.position.z = -250; // Position back along negative Z axis to view Layer 0 in front
+        // camera.lookAt(0, 0, 0); // Look towards the Z=0 plane
+        // controls.target.set(0, 0, 0); // Target the Z=0 plane
+
+        // --- REVERTED & MODIFIED Camera View: Original X/Z, Positive Y ---
+        camera.position.x = dataPlaneSize * 0.8 + uiPlaneXOffset; // Original X
+        camera.position.y = dataPlaneSize * 1.2;        // Positive Y (view from above)
+        camera.position.z = -250;                     // Original Z
+        camera.lookAt(0, 0, 0);                       // Original lookAt target
+        controls.target.set(0, 0, 0);                   // Original controls target
+        // --- End REVERTED & MODIFIED Camera View ---
 
         // --- Node Info Panel ---
         const nodeInfoPanel = document.getElementById('node-info');
@@ -1815,6 +1901,21 @@
                 }
             });
         }
+
+        // --- Menu Toggle Logic ---
+        const menuToggleButton = document.getElementById('menu-toggle-button');
+        const layerMenu = document.getElementById('layer-menu');
+
+        menuToggleButton.addEventListener('click', () => {
+            layerMenu.classList.toggle('menu-hidden');
+            // Update button text based on state
+            if (layerMenu.classList.contains('menu-hidden')) {
+                menuToggleButton.textContent = 'Show';
+            } else {
+                menuToggleButton.textContent = 'Hide';
+            }
+        });
+        // --- End Menu Toggle Logic ---
 
     </script>
 </body>

@@ -18,12 +18,17 @@
             "end_year": 2024
         },
         "violation": [
-            "21 U.S. Code § 841"
+            "21 U.S.C. § 841",
+            "21 U.S.C. § 846"
         ],
         "relatedLinks": [
             {
                 "url": "https://www.law.cornell.edu/uscode/text/21/841",
-                "text": "21 U.S. Code § 841 - Prohibited acts A"
+                "text": "21 U.S.C. § 841 - Distribution of controlled substances"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/21/846",
+                "text": "21 U.S.C. § 846 - Attempt and conspiracy"
             },
             {
                 "url": "#",
@@ -86,27 +91,32 @@
             "end_year": 2023
         },
         "violation": [
-            "15 U.S. Code § 78j",
-            "18 U.S. Code § 1347",
-            "42 U.S. Code § 1320a–7b",
-            "18 U.S. Code § 1343"
+            "18 U.S.C. § 1349",
+            "18 U.S.C. § 1347",
+            "18 U.S.C. § 371",
+            "18 U.S.C. § 220",
+            "15 U.S.C. § 78j"
         ],
         "relatedLinks": [
             {
-                "url": "https://www.law.cornell.edu/uscode/text/15/78j",
-                "text": "15 U.S. Code § 78j - Manipulative and deceptive devices"
+                "url": "https://www.law.cornell.edu/uscode/text/18/1349",
+                "text": "18 U.S.C. § 1349 - Conspiracy to commit healthcare fraud and wire fraud"
             },
             {
                 "url": "https://www.law.cornell.edu/uscode/text/18/1347",
-                "text": "18 U.S. Code § 1347 - Health care fraud"
+                "text": "18 U.S.C. § 1347 - Health care fraud"
             },
             {
-                "url": "https://www.law.cornell.edu/uscode/text/42/1320a-7b",
-                "text": "42 U.S. Code § 1320a–7b - Criminal penalties for acts involving Federal health care programs"
+                "url": "https://www.law.cornell.edu/uscode/text/18/371",
+                "text": "18 U.S.C. § 371 - Conspiracy to pay kickbacks"
             },
             {
-                "url": "https://www.law.cornell.edu/uscode/text/18/1343",
-                "text": "18 U.S. Code § 1343 - Fraud by wire, radio, or television"
+                "url": "https://www.law.cornell.edu/uscode/text/18/220",
+                "text": "18 U.S.C. § 220 - EKRA (Eliminating Kickbacks in Recovery Act)"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/15/78j",
+                "text": "15 U.S.C. § 78j - Securities fraud"
             },
             {
                 "url": "#",
@@ -180,22 +190,27 @@
             "end_year": 2025
         },
         "violation": [
-            "21 U.S. Code § 841",
-            "18 U.S. Code § 1347",
-            "18 U.S. Code § 1512"
+            "21 U.S.C. § 841",
+            "21 U.S.C. § 846",
+            "18 U.S.C. § 1349",
+            "18 U.S.C. § 1512"
         ],
         "relatedLinks": [
             {
                 "url": "https://www.law.cornell.edu/uscode/text/21/841",
-                "text": "21 U.S. Code § 841 - Prohibited acts A"
+                "text": "21 U.S.C. § 841 - Distribution of controlled substances"
             },
             {
-                "url": "https://www.law.cornell.edu/uscode/text/18/1347",
-                "text": "18 U.S. Code § 1347 - Health care fraud"
+                "url": "https://www.law.cornell.edu/uscode/text/21/846",
+                "text": "21 U.S.C. § 846 - Conspiracy to distribute controlled substances"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/18/1349",
+                "text": "18 U.S.C. § 1349 - Conspiracy to commit health care fraud"
             },
             {
                 "url": "https://www.law.cornell.edu/uscode/text/18/1512",
-                "text": "18 U.S. Code § 1512 - Tampering with a witness, victim, or an informant"
+                "text": "18 U.S.C. § 1512 - Obstruction of justice"
             },
             {
                 "url": "#",
@@ -258,22 +273,27 @@
             "end_year": 2025
         },
         "violation": [
-            "18 U.S. Code § 1347",
-            "18 U.S. Code § 1343",
-            "42 U.S. Code § 1320a–7b"
+            "18 U.S.C. § 1349",
+            "18 U.S.C. § 1347",
+            "42 U.S.C. § 1320a-7b",
+            "18 U.S.C. § 1001"
         ],
         "relatedLinks": [
             {
-                "url": "https://www.law.cornell.edu/uscode/text/18/1347",
-                "text": "18 U.S. Code § 1347 - Health care fraud"
+                "url": "https://www.law.cornell.edu/uscode/text/18/1349",
+                "text": "18 U.S.C. § 1349 - Conspiracy to commit health care fraud and wire fraud"
             },
             {
-                "url": "https://www.law.cornell.edu/uscode/text/18/1343",
-                "text": "18 U.S. Code § 1343 - Fraud by wire, radio, or television"
+                "url": "https://www.law.cornell.edu/uscode/text/18/1347",
+                "text": "18 U.S.C. § 1347 - Health care fraud"
             },
             {
                 "url": "https://www.law.cornell.edu/uscode/text/42/1320a-7b",
-                "text": "42 U.S. Code § 1320a–7b - Criminal penalties for acts involving Federal health care programs"
+                "text": "42 U.S.C. § 1320a-7b - Conspiracy to pay and receive health care kickbacks"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/18/1001",
+                "text": "18 U.S.C. § 1001 - False statements"
             },
             {
                 "url": "#",
@@ -339,17 +359,17 @@
             "end_year": 2022
         },
         "violation": [
-            "18 U.S. Code § 1349",
-            "18 U.S. Code § 1343"
+            "18 U.S.C. § 1349",
+            "18 U.S.C. § 1343"
         ],
         "relatedLinks": [
             {
                 "url": "https://www.law.cornell.edu/uscode/text/18/1349",
-                "text": "18 U.S. Code § 1349 - Attempt and conspiracy"
+                "text": "18 U.S.C. § 1349 - Conspiracy to commit wire fraud"
             },
             {
                 "url": "https://www.law.cornell.edu/uscode/text/18/1343",
-                "text": "18 U.S. Code § 1343 - Fraud by wire, radio, or television"
+                "text": "18 U.S.C. § 1343 - Wire fraud"
             },
             {
                 "url": "#",
@@ -358,10 +378,6 @@
             {
                 "url": "#",
                 "text": "Investor Fraud"
-            },
-            {
-                "url": "#",
-                "text": "Health Care Fraud"
             },
             {
                 "url": "#",

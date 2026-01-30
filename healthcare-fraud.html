@@ -7,23 +7,25 @@
 <title>Healthcare Fraud | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_import/custom-style.932d0abe.css">
+<link rel="preload" as="style" href="./_import/custom-style.bb910f46.css">
 <link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_import/custom-style.932d0abe.css">
+<link rel="stylesheet" type="text/css" href="./_import/custom-style.bb910f46.css">
 <link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
 <link rel="modulepreload" href="./_observablehq/client.d432cce1.js">
 <link rel="modulepreload" href="./_observablehq/runtime.e080113b.js">
 <link rel="modulepreload" href="./_observablehq/stdlib.aea91b37.js">
-<link rel="modulepreload" href="./_import/components/index.6f9d11e0.js">
+<link rel="modulepreload" href="./_import/components/index.c470e625.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.f865ba57.js">
 <link rel="modulepreload" href="./_import/components/yearHeatmap.1e8263f3.js">
 <link rel="modulepreload" href="./_import/components/fraudCard.df8ea991.js">
 <link rel="modulepreload" href="./_import/components/statsPanel.ce0fd59e.js">
 <link rel="modulepreload" href="./_import/components/charts.ee899069.js">
+<link rel="modulepreload" href="./_import/components/usStateMap.59b16706.js">
 <link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/0bada646.js">
 <link rel="modulepreload" href="./_npm/d3@7.9.0/7055d4c5.js">
 <link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
+<link rel="modulepreload" href="./_npm/topojson-client@3.1.0/44d97fcb.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
 <link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/e95f898e.js">
@@ -67,11 +69,11 @@ import {registerFile} from "./_observablehq/stdlib.aea91b37.js";
 
 registerFile("./data/healthcare_frauds.json", {"name":"./data/healthcare_frauds.json","mimeType":"application/json","path":"./_file/data/healthcare_frauds.3bba4518.json","lastModified":1769748322673,"size":216086});
 
-define({id: "9eb68401", outputs: ["fraudCardList","fraudStatsPanel","stateFraudAmountChart","stateCaseCountChart"], body: async () => {
-const {fraudCardList, fraudStatsPanel, stateFraudAmountChart, stateCaseCountChart} = await import("./_import/components/index.6f9d11e0.js");
+define({id: "e12bc247", outputs: ["fraudCardList","fraudStatsPanel","stateFraudAmountChart","stateCaseCountChart","createUsStateFraudMap"], body: async () => {
+const {fraudCardList, fraudStatsPanel, stateFraudAmountChart, stateCaseCountChart, createUsStateFraudMap} = await import("./_import/components/index.c470e625.js");
 // Import shared components
 
-return {fraudCardList,fraudStatsPanel,stateFraudAmountChart,stateCaseCountChart};
+return {fraudCardList,fraudStatsPanel,stateFraudAmountChart,stateCaseCountChart,createUsStateFraudMap};
 }});
 
 define({id: "7bb5f8bd", inputs: ["FileAttachment"], outputs: ["data"], body: (FileAttachment) => {
@@ -119,6 +121,17 @@ search_input
 define({id: "8b7b4d1d", mode: "inline", inputs: ["fraudStatsPanel","filtered_data","display"], body: async (fraudStatsPanel,filtered_data,display) => {
 display(await(
 fraudStatsPanel(filtered_data)
+))
+}});
+
+define({id: "d57850d8", inputs: ["createUsStateFraudMap","filtered_data"], outputs: ["fraudMap"], body: (createUsStateFraudMap,filtered_data) => {
+const fraudMap = createUsStateFraudMap(filtered_data, { width: 800, height: 500 });
+return {fraudMap};
+}});
+
+define({id: "f4633d48", mode: "inline", inputs: ["fraudMap","display"], body: async (fraudMap,display) => {
+display(await(
+fraudMap
 ))
 }});
 
@@ -197,7 +210,7 @@ fraudCardList(filtered_data, { timelineStartYear: 2014, timelineEndYear: 2026 })
 <h2 id="intro" tabindex="-1"><a class="observablehq-header-anchor" href="#intro">Intro</a></h2>
 <p style="font-size: 0.8em;">Healthcare Fraud Database is a comprehensive resource compiling information on fraudulent activities within the healthcare industry. Based on my experience in healthcare startup, interactions with investors, executives, much of the fraud is overlooked as "part of business". This database serves as a centralized repository of reported cases and schemes, sourced primarily from news articles, press releases, Department of Justice reports, and Federal Trade Commission announcements. This website is currently work-in-progress, as the data validation is ongoing.
 <span style="font-size: 1em;"><a href="https://www.linkedin.com/in/jung-hoon-son/" target="_blank" rel="noopener noreferrer">Jung Hoon Son, M.D.</a></span></p>
-<div class="observablehq observablehq--block"><!--:9eb68401:--></div>
+<div class="observablehq observablehq--block"><!--:e12bc247:--></div>
 <div class="observablehq observablehq--block"><!--:7bb5f8bd:--></div>
 <div class="observablehq observablehq--block"><!--:c2451566:--></div>
 <div class="observablehq observablehq--block"><!--:516d1363:--></div>
@@ -210,8 +223,13 @@ fraudCardList(filtered_data, { timelineStartYear: 2014, timelineEndYear: 2026 })
 <div>
 <observablehq-loading></observablehq-loading><!--:8b7b4d1d:-->
 </div>
+<h3 id="fraud-by-state" tabindex="-1"><a class="observablehq-header-anchor" href="#fraud-by-state">Fraud by State</a></h3>
+<div class="observablehq observablehq--block"><!--:d57850d8:--></div>
+<div class="card">
+<observablehq-loading></observablehq-loading><!--:f4633d48:-->
+</div>
 <hr>
-<div class="grid grid-cols-4">
+<div class="grid grid-cols-2">
   <div>
     <h3>Top Fraud Amount (by State)</h3><observablehq-loading></observablehq-loading><!--:513946b3:-->
   </div>

@@ -1,5 +1,73 @@
 [
     {
+        "title": "United States v. Cerebral Inc.",
+        "caseNumber": "Nonprosecution Agreement",
+        "state": "New York",
+        "plaintiff": "United States Department of Justice",
+        "defendant": "Cerebral Inc.",
+        "clinicianType": "Digital Health Company",
+        "affiliatedEntities": [
+            {
+                "npi": "",
+                "label": "Cerebral Inc."
+            }
+        ],
+        "summary": "Cerebral Inc., a digital mental health startup valued at $4.8 billion, entered into a nonprosecution agreement with the U.S. Attorney's Office for the Eastern District of New York. The company was investigated for policies and practices that encouraged the unauthorized distribution of controlled substances, specifically ADHD stimulants, from 2019 to 2022. Prosecutors alleged Cerebral sought to drive up profits by pushing clinicians to prescribe ADHD medications, using financial incentives and prescription metrics that did not consider medical appropriateness. The company agreed to forfeit $3.65 million and pay a $2.92 million fine (deferred). The company's founder/CEO Kyle Robertson was ousted in 2022, and Cerebral subsequently stopped prescribing controlled substances altogether.",
+        "timeline": {
+            "start_year": 2019,
+            "end_year": 2024
+        },
+        "violation": [
+            "21 U.S. Code § 841"
+        ],
+        "relatedLinks": [
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/21/841",
+                "text": "21 U.S. Code § 841 - Prohibited acts A"
+            },
+            {
+                "url": "#",
+                "text": "Controlled Substance Distribution"
+            },
+            {
+                "url": "#",
+                "text": "Telemedicine Fraud"
+            },
+            {
+                "url": "#",
+                "text": "ADHD Prescribing"
+            }
+        ],
+        "category": "Controlled Substance Distribution",
+        "fraudAmount": 6570000,
+        "affectedLabel": "Settlement Amount",
+        "commentary": [
+            {
+                "comment": "This case marks a significant regulatory action against a venture-backed telehealth startup, demonstrating that high valuations and investor backing do not shield companies from enforcement actions.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            },
+            {
+                "comment": "The nonprosecution agreement, rather than criminal charges, reflects Cerebral's cooperation and remedial actions including terminating its CEO and ceasing controlled substance prescriptions entirely.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            },
+            {
+                "comment": "Combined with an earlier $7 million FTC settlement for privacy violations and an additional $15 million FTC settlement for cancellation practices, Cerebral faces total regulatory penalties exceeding $28 million.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            }
+        ],
+        "sources": [
+            {
+                "url": "https://www.justice.gov/usao-edny/pr/telehealth-company-cerebral-agrees-pay-over-36-million-connection-business-practices"
+            },
+            {
+                "url": "https://bhbusiness.com/2024/11/05/cerebral-hit-with-6-6m-penalty-in-settlement-with-prosecutors/"
+            }
+        ]
+    },
+    {
         "title": "United States v. Mark Schena",
         "caseNumber": "Case Number: Unknown",
         "state": "California",
@@ -106,10 +174,10 @@
                 "label": "Done Health P.C."
             }
         ],
-        "summary": "Ruthia He, founder and CEO of Done Global Inc., and David Brody, clinical president of Done Health P.C., were arrested for allegedly participating in a scheme to distribute Adderall over the internet, commit health care fraud, and obstruct justice. They allegedly exploited telemedicine rules during the COVID-19 pandemic to provide easy access to Adderall and other stimulants without legitimate medical purpose, generating over $100 million in revenue by arranging for the prescription of over 40 million pills. They also allegedly defrauded Medicare, Medicaid, and commercial insurers of approximately $14 million. The defendants are accused of using deceptive advertising, structuring their platform to facilitate drug access, and obstructing justice by deleting documents and failing to respond to subpoenas.",
+        "summary": "Ruthia He, founder and CEO of Done Global Inc., and David Brody, clinical president of Done Health P.C., were convicted in November 2025 in the DOJ's first criminal drug distribution prosecution against a digital health company. They exploited telemedicine rules during the COVID-19 pandemic to provide easy access to Adderall and other stimulants without legitimate medical purpose, generating over $100 million in revenue by arranging for the prescription of over 40 million pills. The scheme defrauded Medicare, Medicaid, and commercial insurers of approximately $14 million. Done used an 'auto-refill' policy allowing patients to obtain continued prescriptions after an initial encounter without any further interaction with a medical professional. The defendants were found guilty of conspiracy and unlawful distribution of controlled substances, as well as healthcare fraud. The case marks a watershed moment for telehealth enforcement.",
         "timeline": {
             "start_year": 2020,
-            "end_year": 2024
+            "end_year": 2025
         },
         "violation": [
             "21 U.S. Code § 841",
@@ -172,6 +240,81 @@
         ]
     },
     {
+        "title": "United States v. Gary Cox (DMERx)",
+        "caseNumber": "Case Number: Unknown",
+        "state": "Arizona",
+        "plaintiff": "United States Department of Justice",
+        "defendant": "Gary Cox",
+        "clinicianType": "Healthcare Software Company CEO",
+        "affiliatedEntities": [
+            {
+                "npi": "",
+                "label": "Power Mobility Doctor Rx, LLC (DMERx)"
+            }
+        ],
+        "summary": "Gary Cox, 79, CEO of DMERx, was sentenced to 15 years in prison and ordered to pay $452 million in restitution for orchestrating a $1 billion healthcare fraud conspiracy. Cox operated an internet platform that generated false and fraudulent doctors' orders for unnecessary medical items including orthotic braces and pain creams. The operation targeted hundreds of thousands of Medicare beneficiaries through misleading mailers and offshore call centers. Doctors signed orders without regard to medical necessity, based only on brief telephone calls or no interaction at all. Cox coordinated illegal kickbacks between telemedicine companies, pharmacies, and durable medical equipment suppliers. Medicare and insurers paid more than $360 million based on these fraudulent claims.",
+        "timeline": {
+            "start_year": 2018,
+            "end_year": 2025
+        },
+        "violation": [
+            "18 U.S. Code § 1347",
+            "18 U.S. Code § 1343",
+            "42 U.S. Code § 1320a–7b"
+        ],
+        "relatedLinks": [
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/18/1347",
+                "text": "18 U.S. Code § 1347 - Health care fraud"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/18/1343",
+                "text": "18 U.S. Code § 1343 - Fraud by wire, radio, or television"
+            },
+            {
+                "url": "https://www.law.cornell.edu/uscode/text/42/1320a-7b",
+                "text": "42 U.S. Code § 1320a–7b - Criminal penalties for acts involving Federal health care programs"
+            },
+            {
+                "url": "#",
+                "text": "Health Care Fraud"
+            },
+            {
+                "url": "#",
+                "text": "Kickbacks"
+            },
+            {
+                "url": "#",
+                "text": "Healthcare Software Platform"
+            }
+        ],
+        "category": "Health Care Fraud and Kickbacks",
+        "fraudAmount": 1000000000,
+        "affectedLabel": "Fraudulent Claims Submitted",
+        "commentary": [
+            {
+                "comment": "This case represents the largest healthcare software platform fraud by a single CEO, demonstrating how technology platforms can be weaponized to facilitate large-scale billing fraud across multiple states.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            },
+            {
+                "comment": "The 15-year sentence for a 79-year-old defendant reflects the severity with which courts treat systematic exploitation of Medicare beneficiaries through technology platforms.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            },
+            {
+                "comment": "The scheme's use of offshore call centers and misleading mailers targeting elderly beneficiaries highlights the intersection of traditional telemarketing fraud with modern healthcare technology.",
+                "source": "AI Analysis",
+                "added_by": "Claude"
+            }
+        ],
+        "sources": [
+            {
+                "url": "https://www.justice.gov/opa/pr/ceo-health-care-software-company-sentenced-1b-fraud-conspiracy"
+            }
+        ]
+    },
+    {
         "title": "United States v. Elizabeth Holmes and Ramesh 'Sunny' Balwani",
         "caseNumber": "Case Number: Unknown",
         "state": "California",
@@ -190,7 +333,7 @@
                 "label": "Theranos, Inc."
             }
         ],
-        "summary": "Elizabeth Holmes and Ramesh 'Sunny' Balwani were charged with multiple counts of conspiracy to commit wire fraud and wire fraud for their roles in schemes to defraud investors and patients through their company Theranos. They allegedly made false claims about Theranos's blood-testing technology, its financial condition, and future prospects. Holmes was convicted on four counts and sentenced to 135 months in prison. Balwani was convicted on all counts and sentenced to 155 months in prison. Both were ordered to serve three years of supervision after release.",
+        "summary": "Elizabeth Holmes and Ramesh 'Sunny' Balwani were convicted for conspiracy to commit wire fraud and wire fraud for defrauding investors and patients through their company Theranos. They made false claims about Theranos's revolutionary blood-testing technology, its financial condition, and future prospects. Holmes was initially sentenced to 135 months (11+ years) in prison, but good conduct time has reduced her projected release to August 2032 - potentially serving just 66 months of her original sentence. She entered Federal Prison Camp Bryan in May 2023. Balwani was convicted on all counts and sentenced to 155 months. An appeal regarding convictions, sentences, and restitution orders was heard in June 2024. Holmes gave her first post-prison interview in 2025, maintaining her innocence.",
         "timeline": {
             "start_year": 2018,
             "end_year": 2022

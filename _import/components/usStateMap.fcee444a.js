@@ -153,6 +153,7 @@ export function usStateFraudMap(data, us, options = {}) {
  * Use this in Observable Framework with await
  */
 export async function createUsStateFraudMap(data, options = {}) {
-  const us = await d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json");
+  // Use non-projected TopoJSON so we can apply projection in Plot
+  const us = await d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json");
   return usStateFraudMap(data, us, options);
 }

@@ -113,29 +113,44 @@ export function usStateFraudMap(data, us, options = {}) {
     stateValues.set(feature.id, { value, name: stateName, abbr });
   });
 
-  // Format value for display
+  // Format value for display (shorthand)
   const formatValue = metric === "count"
     ? d => `${d} cases`
-    : d => `$${d3.format(".3s")(d).replace(/G/, "B")}`;
+    : d => {
+        if (d >= 1e9) return `$${(d / 1e9).toFixed(1)}B`;
+        if (d >= 1e6) return `$${(d / 1e6).toFixed(0)}M`;
+        if (d >= 1e3) return `$${(d / 1e3).toFixed(0)}K`;
+        return `$${d}`;
+      };
 
-  // Format for legend ticks
-  const tickFormat = metric === "count"
-    ? d => d
-    : d => `$${d3.format(".2s")(d).replace(/G/, "B")}`;
+  // Color scale config - threshold with $1B+ as top bucket
+  const colorConfig = metric === "count"
+    ? {
+        type: "quantize",
+        n: 5,
+        domain: [0, d3.max(stateData.values())],
+        scheme: colorScheme,
+        label: "Cases",
+        legend: true
+      }
+    : {
+        type: "threshold",
+        domain: [10e6, 50e6, 100e6, 500e6, 1e9], // $10M, $50M, $100M, $500M, $1B+
+        scheme: colorScheme,
+        label: "Fraud amount",
+        legend: true,
+        tickFormat: d => {
+          if (d >= 1e9) return "$1B+";
+          if (d >= 1e6) return `$${d / 1e6}M`;
+          return "$0";
+        }
+      };
 
   return Plot.plot({
     width,
     height,
     projection: "albers-usa",
-    color: {
-      type: "quantize",
-      n: 5,
-      domain: [0, d3.max(stateData.values())],
-      scheme: colorScheme,
-      label: metric === "count" ? "Cases" : "Fraud amount",
-      legend: true,
-      tickFormat
-    },
+    color: colorConfig,
     marks: [
       Plot.geo(states, {
         fill: d => stateValues.get(d.id)?.value || 0,

@@ -69,141 +69,83 @@ import {registerTable} from "./_observablehq/stdlib/duckdb.1b7d11e1.js";
 registerFile("./data/biotech_levels.csv", {"name":"./data/biotech_levels.csv","mimeType":"text/csv","path":"./_file/data/biotech_levels.81158144.csv","lastModified":1727840602373,"size":817130});
 registerTable("biotech_levels", FileAttachment("./data/biotech_levels.csv"));
 
-define({id: "9b176f1a", inputs: ["FileAttachment"], outputs: ["biotech_levels_data"], body: (FileAttachment) => {
+define({id: "3cdb9a4a", inputs: ["FileAttachment"], outputs: ["aq","biotech_levels_data"], body: async (FileAttachment) => {
+const aq = await import("./_npm/arquero@5.4.0/3861566f.js");
 const biotech_levels_data = FileAttachment("./data/biotech_levels.csv").csv({typed: true});
-return {biotech_levels_data};
+return {aq,biotech_levels_data};
 }});
 
-define({id: "2aad0ea3", inputs: ["Inputs","biotech_levels_data"], outputs: ["search_input"], body: (Inputs,biotech_levels_data) => {
+define({id: "0c7fb74e", inputs: ["biotech_levels_data","d3"], outputs: ["totalRecords","medianSalary","avgSalary","uniqueCompanies","uniqueLocations"], body: (biotech_levels_data,d3) => {
+// Calculate summary stats
+const totalRecords = biotech_levels_data.length;
+const medianSalary = d3.median(biotech_levels_data, d => d["Compensation - Annual Base Salary/Pay"]);
+const avgSalary = d3.mean(biotech_levels_data, d => d["Compensation - Annual Base Salary/Pay"]);
+const uniqueCompanies = new Set(biotech_levels_data.map(d => d["Company or Institution Name"])).size;
+const uniqueLocations = new Set(biotech_levels_data.filter(d => d["Hub Mapped"]).map(d => d["Hub Mapped"])).size;
+return {totalRecords,medianSalary,avgSalary,uniqueCompanies,uniqueLocations};
+}});
+
+define({id: "ff626f9f", mode: "inline", inputs: ["totalRecords","display"], body: async (totalRecords,display) => {
+display(await(
+totalRecords.toLocaleString()
+))
+}});
+
+define({id: "2d8bfb8b", mode: "inline", inputs: ["d3","medianSalary","display"], body: async (d3,medianSalary,display) => {
+display(await(
+d3.format("$,.0f")(medianSalary)
+))
+}});
+
+define({id: "c20ad208", mode: "inline", inputs: ["uniqueCompanies","display"], body: async (uniqueCompanies,display) => {
+display(await(
+uniqueCompanies.toLocaleString()
+))
+}});
+
+define({id: "eb4601c9", mode: "inline", inputs: ["uniqueLocations","display"], body: async (uniqueLocations,display) => {
+display(await(
+uniqueLocations
+))
+}});
+
+define({id: "cd6b6ec9", inputs: ["Inputs","biotech_levels_data","Generators"], outputs: ["search_input","search_result"], body: (Inputs,biotech_levels_data,Generators) => {
 // Free-text search
-const search_input = Inputs.search(biotech_levels_data, {placeholder: "Search all fields"});
-return {search_input};
-}});
-
-define({id: "580ff2cc", inputs: ["Generators","search_input"], outputs: ["search_result"], body: (Generators,search_input) => {
-// Generator for the results
+const search_input = Inputs.search(biotech_levels_data, {placeholder: "Search all fields (company, title, location...)"});
 const search_result = Generators.input(search_input);
-return {search_result};
+return {search_input,search_result};
 }});
 
-define({id: "adfff054", inputs: ["aq","search_result"], outputs: ["search_result_aq"], body: (aq,search_result) => {
-// const search_result_aq = FileAttachment("data/biotech_levels.csv").arquero()
-const search_result_aq =  aq.from(search_result)
-return {search_result_aq};
+define({id: "ea322662", inputs: ["biotech_levels_data","Inputs","Generators"], outputs: ["degrees","degree_select","selected_degree"], body: (biotech_levels_data,Inputs,Generators) => {
+// Degree filter
+const degrees = [...new Set(biotech_levels_data.map(d => d["What degrees do you have?"]).filter(d => d))].sort();
+const degree_select = Inputs.select(["All Degrees", ...degrees], {label: "Degree", value: "All Degrees"});
+const selected_degree = Generators.input(degree_select);
+return {degrees,degree_select,selected_degree};
 }});
 
-define({id: "2ec65455", outputs: ["GLOBAL_HEIGHT"], body: () => {
-const GLOBAL_HEIGHT = 350;
-return {GLOBAL_HEIGHT};
+define({id: "fc2b6d1f", inputs: ["biotech_levels_data","Inputs","Generators"], outputs: ["locations","location_select","selected_location"], body: (biotech_levels_data,Inputs,Generators) => {
+// Location filter
+const locations = [...new Set(biotech_levels_data.map(d => d["Hub Mapped"]).filter(d => d))].sort();
+const location_select = Inputs.select(["All Locations", ...locations], {label: "Location", value: "All Locations"});
+const selected_location = Generators.input(location_select);
+return {locations,location_select,selected_location};
 }});
 
-define({id: "01ba4719", body: () => {
-
+define({id: "e00ddbb1", inputs: ["Inputs","Generators"], outputs: ["exp_range","min_experience"], body: (Inputs,Generators) => {
+// Experience range
+const exp_range = Inputs.range([0, 35], {label: "Min Years Experience", step: 1, value: 0});
+const min_experience = Generators.input(exp_range);
+return {exp_range,min_experience};
 }});
 
-define({id: "8075c65e", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["comp_scatter"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
-const comp_scatter = Plot.plot({
-  title: "Annual Compensation vs. Years of Experience",
-  width: width,
-  height: GLOBAL_HEIGHT,
-  y: {
-    domain: [0, 650000],
-  },
-  x: {
-    domain: [0, 35],
-    insetLeft: 90
-  },
-  color: {
-    // legend: true,
-  },
-  marks: [
-    // Plot.frame(),
-    Plot.ruleY([0]),
-    Plot.gridY({
-      strokeDasharray: "0.75,2", // dashed
-      strokeOpacity: 1 // opaque
-    }),
-    Plot.axisY({
-      tickSize: 0,
-      dx: 65,
-      dy: -5,
-      lineAnchor: "bottom", // draw labels above grid lines
-      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
-      tickFormat: d => `${d3.format("$,.0f")(d)}`
-    }),
-    Plot.axisX({
-      interval: 1,
-      // rotate: -90,
-      // dx: -5,
-      // marginLeft: 100,
-      // marginTop: 50, 
-    }),
-    Plot.dot(biotech_levels_data, {
-      x: "Years of Experience",
-      y: "Compensation - Annual Base Salary/Pay", 
-      channels: {
-        "Institution": "Company or Institution Name",
-      },
-      // opacity: 0.2,
-      stroke: "gray",
-      tip: {
-        "Compensation - Annual Base Salary/Pay": false,
-        "x": false,
-        lineWidth: 300,
-        anchor: "bottom",
-        fill: "#f4f4f4",
-        lineHeight: 1.5,
-      },
-    }),
-    Plot.dot(
-      search_result, {
-      x: "Years of Experience",
-      y: "Compensation - Annual Base Salary/Pay", 
-      fill: "#eeffff",
-      stroke: "red",
-      // opacity: 0.6,
-      r: 4,
-    }),
-    Plot.linearRegressionY(biotech_levels_data, {
-      x: "Years of Experience", 
-      y: "Compensation - Annual Base Salary/Pay", 
-      stroke: "gray",
-      opacity: 0.5,
-    }),
-    Plot.linearRegressionY(search_result, {
-      x: "Years of Experience", 
-      y: "Compensation - Annual Base Salary/Pay", 
-      stroke: "red",
-    }),
-    Plot.ruleY(biotech_levels_data, Plot.pointerX({
-        px: "Years of Experience", 
-        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
-        insetLeft: 65,
-        stroke: "green"}
-    )),
-    Plot.text(biotech_levels_data, Plot.pointerX({
-        px: "Years of Experience", 
-        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
-        frameAnchor: "left", 
-        textAnchor: "right",
-        fill: "green",
-        fontWeight: 600,
-        fontSize: 20,
-        dx: 20,
-        backgroundColor: "white",
-        text: d => parseInt(d["Compensation - Annual Base Salary/Pay"])
-      }
-    )),
-    Plot.dot(biotech_levels_data, Plot.pointerX({
-        x: "Years of Experience", 
-        y: d => parseInt(d["Compensation - Annual Base Salary/Pay"]), 
-        stroke: "red", 
-        fill: "white"
-      }
-    )),
-  ]
-})
-return {comp_scatter};
+define({id: "15841e53", inputs: ["search_result","selected_degree","selected_location","min_experience"], outputs: ["filtered_data"], body: (search_result,selected_degree,selected_location,min_experience) => {
+// Apply all filters
+const filtered_data = search_result
+  .filter(d => selected_degree === "All Degrees" || d["What degrees do you have?"] === selected_degree)
+  .filter(d => selected_location === "All Locations" || d["Hub Mapped"] === selected_location)
+  .filter(d => d["Years of Experience"] >= min_experience);
+return {filtered_data};
 }});
 
 define({id: "52c1d7cf", mode: "inline", inputs: ["search_input","display"], body: async (search_input,display) => {
@@ -212,114 +154,96 @@ search_input
 ))
 }});
 
-define({id: "257ba2f3", mode: "inline", inputs: ["degree_boxplot","display"], body: async (degree_boxplot,display) => {
+define({id: "bb0b706b", mode: "inline", inputs: ["degree_select","display"], body: async (degree_select,display) => {
 display(await(
-degree_boxplot
+degree_select
 ))
 }});
 
-define({id: "62832552", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","search_result"], outputs: ["comp_boxplot"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,search_result) => {
-const comp_boxplot = Plot.plot({
-  title: "Boxplot by Years of Experience",
+define({id: "986eafb1", mode: "inline", inputs: ["location_select","display"], body: async (location_select,display) => {
+display(await(
+location_select
+))
+}});
+
+define({id: "39017042", mode: "inline", inputs: ["exp_range","display"], body: async (exp_range,display) => {
+display(await(
+exp_range
+))
+}});
+
+define({id: "7312051b", mode: "inline", inputs: ["filtered_data","display"], body: async (filtered_data,display) => {
+display(await(
+filtered_data.length.toLocaleString()
+))
+}});
+
+define({id: "d5553701", mode: "inline", inputs: ["biotech_levels_data","display"], body: async (biotech_levels_data,display) => {
+display(await(
+biotech_levels_data.length.toLocaleString()
+))
+}});
+
+define({id: "7173f2bd", outputs: ["GLOBAL_HEIGHT"], body: () => {
+const GLOBAL_HEIGHT = 400;
+return {GLOBAL_HEIGHT};
+}});
+
+define({id: "3db8ef67", inputs: ["Plot","width","GLOBAL_HEIGHT","d3","biotech_levels_data","filtered_data"], outputs: ["comp_scatter"], body: (Plot,width,GLOBAL_HEIGHT,d3,biotech_levels_data,filtered_data) => {
+const comp_scatter = Plot.plot({
+  title: "Annual Base Salary vs. Years of Experience",
   width: width,
   height: GLOBAL_HEIGHT,
   y: {
-    domain: [0, 650000],
+    domain: [0, 500000],
+    label: "Annual Base Salary ($)",
+    tickFormat: d => d3.format("$,.0f")(d)
   },
   x: {
-    domain: [...Array(36).keys()],
-    insetLeft: 90
+    domain: [0, 35],
+    label: "Years of Experience"
   },
-  marks: [
-    Plot.gridY({
-      strokeDasharray: "0.75,2", 
-      strokeOpacity: 1
-    }),
-    Plot.axisY({
-      tickSize: 0,
-      dx: 65,
-      dy: -5,
-      lineAnchor: "bottom",
-      tickFormat: (d) => (`${d3.format("$,.0f")(d)}`)
-    }),
-    Plot.axisX({
-      // interval: 1,
-      // marginTop: 50, 
-    }),
-    Plot.ruleY([0]),
-    Plot.boxY(biotech_levels_data, {
-      x: "Years of Experience",
-      y: "Compensation - Annual Base Salary/Pay", 
-      opacity: 0.5,
-    }),
-    Plot.boxY(search_result, {
-      x: "Years of Experience",
-      y: "Compensation - Annual Base Salary/Pay", 
-      fill: "red"
-    })
-  ]})
-return {comp_boxplot};
-}});
-
-define({id: "a41c142d", inputs: ["biotech_levels_data"], outputs: ["top_hubs"], body: (biotech_levels_data) => {
-const top_hubs = biotech_levels_data.filter(d => d["Hub Mapped"]!=null).filter(d => d["Hub Count"]>5)
-return {top_hubs};
-}});
-
-define({id: "59112a8e", inputs: ["search_result"], outputs: ["top_hubs_search"], body: (search_result) => {
-const top_hubs_search = search_result.filter(d => d["Hub Mapped"]!=null).filter(d => d["Hub Count"]>5)
-return {top_hubs_search};
-}});
-
-define({id: "0bd4952b", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["hub_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
-const hub_boxplot = Plot.plot({
-  title: "Annual Compensation by Major U.S. Hubs",
-  subtitle: "Filtered by minimum 5 records",
-  width: width,
-  // height: 700,
-  x: {
-    domain: [0, 450000],
-    insetLeft: 150
-  },
-  y: {
-    label: null,
+  color: {
+    legend: true,
+    scheme: "Observable10"
   },
   marks: [
     Plot.ruleY([0]),
-    // Plot.tip(["test"], {frameAnchor: "top-right", "top-right"}),
-    Plot.gridY({
-      strokeDasharray: "0.75,2", // dashed
-      strokeOpacity: 1 // opaque
+    Plot.dot(biotech_levels_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay",
+      fill: "#ddd",
+      stroke: "#bbb",
+      r: 3,
+      opacity: 0.4
     }),
-    Plot.axisX({
-      // interval: 1,
-      // marginTop: 50, 
-    }), 
-    Plot.axisY({
-      tickSize: 0,
-      dx: 10,
-      dy: -5,
-      textAnchor: "start",
-      lineAnchor: "bottom", // draw labels above grid lines
-      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
-      // tickFormat: d => `${d3.format("$,.0f")(d)}`
+    Plot.dot(filtered_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay",
+      fill: "What degrees do you have?",
+      stroke: "#333",
+      r: 5,
+      tip: {
+        format: {
+          x: true,
+          y: d => d3.format("$,.0f")(d),
+        }
+      },
+      channels: {
+        "Company": "Company or Institution Name",
+        "Role": "Role / Title of current position",
+        "Location": "Hub Mapped"
+      }
     }),
-    Plot.boxX(top_hubs, {
-      y: "Hub Mapped",
-      x: "Compensation - Annual Base Salary/Pay", 
-      opacity: 0.8,
-      sort: {y: "x", reverse: true}
-    }),
-    Plot.boxX(top_hubs_search, {
-      y: "Hub Mapped",
-      x: "Compensation - Annual Base Salary/Pay", 
-      opacity: 0.8,
-      fill: "blue",
-      sort: {y: "x", reverse: true}
+    Plot.linearRegressionY(filtered_data, {
+      x: "Years of Experience",
+      y: "Compensation - Annual Base Salary/Pay",
+      stroke: "#e63946",
+      strokeWidth: 2
     }),
   ]
 })
-return {hub_boxplot};
+return {comp_scatter};
 }});
 
 define({id: "7f972c88", mode: "inline", inputs: ["comp_scatter","display"], body: async (comp_scatter,display) => {
@@ -328,15 +252,96 @@ comp_scatter
 ))
 }});
 
-define({id: "a95b3907", mode: "inline", inputs: ["comp_boxplot","display"], body: async (comp_boxplot,display) => {
+define({id: "817f124a", inputs: ["aq","filtered_data"], outputs: ["search_result_aq","degree_counts"], body: (aq,filtered_data) => {
+const search_result_aq = aq.from(filtered_data);
+const degree_counts = search_result_aq.groupby("What degrees do you have?").rollup({
+  count: aq.op.count(),
+  median: aq.op.median("Compensation - Annual Base Salary/Pay"),
+  mean: aq.op.mean("Compensation - Annual Base Salary/Pay")
+}).objects();
+return {search_result_aq,degree_counts};
+}});
+
+define({id: "bf6b3cf3", inputs: ["Plot","width","d3","biotech_levels_data","filtered_data"], outputs: ["degree_boxplot"], body: (Plot,width,d3,biotech_levels_data,filtered_data) => {
+const degree_boxplot = Plot.plot({
+  title: "Annual Compensation by Highest Degree",
+  subtitle: "Box shows 25th-75th percentile, line shows median",
+  width: width,
+  height: 300,
+  marginLeft: 120,
+  x: {
+    domain: [0, 400000],
+    label: "Annual Base Salary ($)",
+    tickFormat: d => d3.format("$,.0f")(d)
+  },
+  y: {
+    label: null
+  },
+  marks: [
+    Plot.boxX(biotech_levels_data, {
+      y: "What degrees do you have?",
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#e5e5e5",
+      stroke: "#999",
+      sort: {y: "x", reverse: true}
+    }),
+    Plot.boxX(filtered_data, {
+      y: "What degrees do you have?",
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#2563eb",
+      fillOpacity: 0.7,
+      stroke: "#1d4ed8",
+      sort: {y: "x", reverse: true}
+    }),
+  ]
+})
+return {degree_boxplot};
+}});
+
+define({id: "257ba2f3", mode: "inline", inputs: ["degree_boxplot","display"], body: async (degree_boxplot,display) => {
 display(await(
-comp_boxplot
+degree_boxplot
 ))
 }});
 
-define({id: "1d45ffef", inputs: ["search_result"], outputs: ["hub_check"], body: (search_result) => {
-const hub_check = [...new Set(search_result.map(d => d['Where is the closest major city or hub?']))]
-return {hub_check};
+define({id: "37c0903a", inputs: ["filtered_data"], outputs: ["top_hubs"], body: (filtered_data) => {
+const top_hubs = filtered_data.filter(d => d["Hub Mapped"] != null);
+return {top_hubs};
+}});
+
+define({id: "9f153343", inputs: ["Plot","width","d3","biotech_levels_data","top_hubs"], outputs: ["hub_boxplot"], body: (Plot,width,d3,biotech_levels_data,top_hubs) => {
+const hub_boxplot = Plot.plot({
+  title: "Annual Compensation by Major U.S. Biotech Hubs",
+  width: width,
+  height: 450,
+  marginLeft: 140,
+  x: {
+    domain: [0, 400000],
+    label: "Annual Base Salary ($)",
+    tickFormat: d => d3.format("$,.0f")(d)
+  },
+  y: {
+    label: null,
+  },
+  marks: [
+    Plot.boxX(biotech_levels_data.filter(d => d["Hub Mapped"] && d["Hub Count"] > 5), {
+      y: "Hub Mapped",
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#e5e5e5",
+      stroke: "#999",
+      sort: {y: "x", reverse: true, limit: 15}
+    }),
+    Plot.boxX(top_hubs.filter(d => d["Hub Count"] > 5), {
+      y: "Hub Mapped",
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#2563eb",
+      fillOpacity: 0.7,
+      stroke: "#1d4ed8",
+      sort: {y: "x", reverse: true, limit: 15}
+    }),
+  ]
+})
+return {hub_boxplot};
 }});
 
 define({id: "2b7a343f", mode: "inline", inputs: ["hub_boxplot","display"], body: async (hub_boxplot,display) => {
@@ -345,52 +350,35 @@ hub_boxplot
 ))
 }});
 
-define({id: "fecf974e", inputs: ["Plot","width","top_hubs","top_hubs_search"], outputs: ["industry_boxplot"], body: (Plot,width,top_hubs,top_hubs_search) => {
+define({id: "70d3b337", inputs: ["Plot","width","d3","biotech_levels_data","filtered_data"], outputs: ["industry_boxplot"], body: (Plot,width,d3,biotech_levels_data,filtered_data) => {
 const industry_boxplot = Plot.plot({
-  title: "Annual Compensation by Industry",
-  subtitle: "This one needs work",
+  title: "Annual Compensation by Biotech Sub-Industry",
   width: width,
-  // height: 350,
+  height: 400,
+  marginLeft: 180,
   x: {
-    domain: [0, 500000],
-    insetLeft: 200
+    domain: [0, 400000],
+    label: "Annual Base Salary ($)",
+    tickFormat: d => d3.format("$,.0f")(d)
   },
-  color: {
-    legend: true,
+  y: {
+    label: null,
   },
   marks: [
-    Plot.ruleY([0]),
-    Plot.gridY({
-      strokeDasharray: "0.75,2", // dashed
-      strokeOpacity: 1 // opaque
-    }),
-    Plot.axisY({
-      tickSize: 0,
-      dx: 10,
-      dy: -5,
-      textAnchor: "start",
-      lineAnchor: "bottom", // draw labels above grid lines
-      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
-      // tickFormat: d => `${d3.format("$,.0f")(d)}`
-    }),
-    Plot.boxX(top_hubs, {
+    Plot.boxX(biotech_levels_data.filter(d => d["Biotech sub industry?"]), {
       y: "Biotech sub industry?",
-      x: "Compensation - Annual Base Salary/Pay", 
-      // color: "Biotech sub industry?",
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#e5e5e5",
       stroke: "#999",
-      opacity: 0.8,
-      insetTop: 5,
-      insetBottom: 5,
-      sort: {y: "x", reverse: true}
+      sort: {y: "x", reverse: true, limit: 12}
     }),
-    Plot.boxX(top_hubs_search, {
+    Plot.boxX(filtered_data.filter(d => d["Biotech sub industry?"]), {
       y: "Biotech sub industry?",
-      x: "Compensation - Annual Base Salary/Pay", 
-      opacity: 0.8,
-      fill: "#33ee33",
-      insetTop: 5,
-      insetBottom: 5,
-      sort: {y: "x", reverse: true}
+      x: "Compensation - Annual Base Salary/Pay",
+      fill: "#2563eb",
+      fillOpacity: 0.7,
+      stroke: "#1d4ed8",
+      sort: {y: "x", reverse: true, limit: 12}
     }),
   ]
 })
@@ -403,143 +391,32 @@ industry_boxplot
 ))
 }});
 
-define({id: "db2fd934", inputs: ["search_result_aq","aq"], outputs: ["degree_counts"], body: (search_result_aq,aq) => {
-const degree_counts = search_result_aq.groupby("What degrees do you have?").rollup(
-  {
-    count: aq.op.count(),
-    median: aq.op.median("Compensation - Annual Base Salary/Pay"),
-    mean: aq.op.mean("Compensation - Annual Base Salary/Pay")
-  }
-)
-  // .filter(
-  //   d => d.count > 25
-  // )
-  .objects()
-return {degree_counts};
+define({id: "d3b415a1", inputs: ["filtered_data"], outputs: ["table_data"], body: (filtered_data) => {
+const table_data = filtered_data.map(d => ({
+  Company: d["Company or Institution Name"],
+  Role: d["Role / Title of current position"],
+  Salary: d["Compensation - Annual Base Salary/Pay"],
+  Experience: d["Years of Experience"],
+  Degree: d["What degrees do you have?"],
+  Location: d["Hub Mapped"] || d["Where is the closest major city or hub?"],
+  Industry: d["Biotech sub industry?"],
+  Year: d["Year"]
+}));
+return {table_data};
 }});
 
-define({id: "37b048ad", inputs: ["Plot","width","top_hubs","top_hubs_search","degree_counts","d3"], outputs: ["degree_boxplot"], body: (Plot,width,top_hubs,top_hubs_search,degree_counts,d3) => {
-const degree_boxplot = Plot.plot({
-  title: "Annual Compensation by Highest Degree",
-  subtitle: "Median Annual Compensation ($) displayed in green.",
-  width: width,
-  height: 280,
-  marginLeft: 10,
-  marginRight: 50,
-  paddingLeft: 10,
-  paddingRight: 10,
-  x: {
-    domain: [0, 400000],
-    insetLeft: 120,
-    insetRight: 50,
+define({id: "060daaa1", mode: "inline", inputs: ["Inputs","table_data","d3","display"], body: async (Inputs,table_data,d3,display) => {
+display(await(
+Inputs.table(table_data, {
+  columns: ["Company", "Role", "Salary", "Experience", "Degree", "Location", "Industry", "Year"],
+  format: {
+    Salary: d => d3.format("$,.0f")(d)
   },
-  y: {
-    grid: true,
-    label: null
-  },
-  color: {
-    legend: true,
-  },
-  marks: [
-    // Plot.ruleX([0], {stroke: "gray", strokeOpacity: 0.4}),
-    Plot.gridY({
-      strokeDasharray: "0.75,2", // dashed
-      strokeOpacity: 1 // opaque
-    }),
-    Plot.gridX({
-      strokeDasharray: "0.1,1 ", // dashed
-      strokeOpacity: 1 // opaque
-    }),
-    Plot.axisY({
-      tickSize: 0,
-      x: 0,
-      dx: -130,
-      dy: -8,
-      anchor: "right", 
-      // textAnchor: "right",
-      // lineAnchor: "top", // draw labels above grid lines
-      // tickFormat: (d, i, _) => (i === _.length - 1 ? `$${d}` : d),
-      // tickFormat: d => `${d3.format("$,.0f")(d)}`
-    }),
-    Plot.boxX(top_hubs, {
-      y: "What degrees do you have?",
-      x: "Compensation - Annual Base Salary/Pay", 
-      color: "What degrees do you have?",
-      stroke: "#999",
-      dy: -18,
-      opacity: 0.8,
-      insetTop: 7,
-      insetBottom: 7,
-      sort: {y: "x", reverse: true}
-    }),
-    Plot.boxX(top_hubs_search, {
-      y: "What degrees do you have?",
-      x: "Compensation - Annual Base Salary/Pay", 
-      // opacity: 0.8,
-      dy: -18,
-      fill: "#118811",
-      insetTop: 7,
-      insetBottom: 7,
-      sort: {y: "x", reverse: true}
-    }),
-    Plot.text(top_hubs_search, {
-      y: "What degrees do you have?", 
-      dy: -21,
-      frameAnchor: "left", 
-      textAnchor: "start",
-      monospace: true,  
-      fontWeight: 200,
-      fontSize: "1.4em",
-      fill: "#118811", 
-      text: d => `${
-        degree_counts
-        .filter(e => e['What degrees do you have?'] == d['What degrees do you have?'])
-        .map(e => d3.format("$,.0f")(parseInt(e['median'])))
-        }`,
-      }
-    ),
-  ]
+  sort: "Salary",
+  reverse: true,
+  rows: 20
 })
-return {degree_boxplot};
-}});
-
-define({id: "50aa4a8e", inputs: ["aq","biotech_levels_data"], outputs: ["levels_daily_count_aq"], body: (aq,biotech_levels_data) => {
-const levels_daily_count_aq =  aq.from(biotech_levels_data)
-  .groupby("Timestamp")
-  .rollup({
-    count: aq.op.count()
-  })
-  .objects()
-return {levels_daily_count_aq};
-}});
-
-define({id: "ff066a66", body: () => {
-// levels_daily_count_aq 
-}});
-
-define({id: "5c9b9acb", body: () => {
-// const timeline_plot = Plot.plot({
-//   x: {
-//     ticks: d3.ticks(...d3.extent(levels_daily_count_aq, (d) => d.Timestamp), 1),
-//     // tickFormat: "d",
-//     interval: 1, // recommended in case of missing data
-//     label: null
-//   },
-//   color: {
-//     scheme: "BuRd"
-//   },
-//   marks: [
-//     Plot.cell(levels_daily_count_aq, {x: "Timestamp", fill: "count"})
-//   ]
-// })
-}});
-
-define({id: "3c609e4a", body: () => {
-// [...d3.extent(levels_daily_count_aq, (d) => d.Timestamp)]
-}});
-
-define({id: "ed70f797", body: () => {
-// timeline_plot
+))
 }});
 
 </script>
@@ -585,65 +462,120 @@ define({id: "ed70f797", body: () => {
 <nav>
 <div>Contents</div>
 <ol>
-<li class="observablehq-secondary-link"><a href="#search-filter">Search Filter</a></li>
-<li class="observablehq-secondary-link"><a href="#degree">∟ Degree</a></li>
-<li class="observablehq-secondary-link"><a href="#years-of-experience">∟ Years of Experience</a></li>
-<li class="observablehq-secondary-link"><a href="#location">∟ Location</a></li>
+<li class="observablehq-secondary-link"><a href="#filters">Filters</a></li>
+<li class="observablehq-secondary-link"><a href="#compensation-by-experience">Compensation by Experience</a></li>
+<li class="observablehq-secondary-link"><a href="#compensation-by-degree">Compensation by Degree</a></li>
+<li class="observablehq-secondary-link"><a href="#compensation-by-location">Compensation by Location</a></li>
+<li class="observablehq-secondary-link"><a href="#compensation-by-industry">Compensation by Industry</a></li>
+<li class="observablehq-secondary-link"><a href="#data-table">Data Table</a></li>
 </ol>
 </nav>
 </aside>
 <main id="observablehq-main" class="observablehq">
 <h1 id="biotech-compensation" tabindex="-1"><a class="observablehq-header-anchor" href="#biotech-compensation">Biotech Compensation</a></h1>
-<div class="observablehq observablehq--block"><!--:9b176f1a:--></div>
-<div class="observablehq observablehq--block"><!--:2aad0ea3:--></div>
-<div class="observablehq observablehq--block"><!--:580ff2cc:--></div>
-<div class="observablehq observablehq--block"><!--:adfff054:--></div>
-<div class="observablehq observablehq--block"><!--:2ec65455:--></div>
-<div class="observablehq observablehq--block"><!--:01ba4719:--></div>
-<div class="observablehq observablehq--block"><!--:8075c65e:--></div>
-<p>This data is sourced from <a href="https://www.reddit.com/r/biotech/comments/18vq4rw/rbiotech_salary_and_company_survey_2024/" target="_blank" rel="noopener noreferrer">Reddit's Biotech Compensation</a> survey. Direct link to data source: <a href="https://docs.google.com/spreadsheets/d/1G0FmJhkOME_sv66hWmhnZS5qR2KMTY7nzkxksv46bfk/edit?gid=491268892#gid=491268892" target="_blank" rel="noopener noreferrer">Google Sheets</a>. You can contribute by <a href="https://forms.gle/s68ExUmPVzhFAaWJ7" target="_blank" rel="noopener noreferrer">Google Forms Link</a>.</p>
-<hr>
-<h1 id="search-filter" tabindex="-1"><a class="observablehq-header-anchor" href="#search-filter">Search Filter</a></h1>
-<div class="tip" label="" style="padding-top:0.1em;">
-<p>Search for any text (e.g. <code>"Pfizer"</code>, <code>"Scientist"</code>, <code>"Director"</code>, <code>"Boston"</code>)</p>
-<p><observablehq-loading></observablehq-loading><!--:52c1d7cf:--></p>
+<p class="subtitle">Explore salary data from the biotech industry across roles, experience levels, and locations.</p>
+<div class="observablehq observablehq--block"><!--:3cdb9a4a:--></div>
+<div class="observablehq observablehq--block"><!--:0c7fb74e:--></div>
+<div class="grid grid-cols-4" style="margin-bottom: 2rem;">
+  <div class="card">
+    <h3>Total Records</h3>
+    <div class="big-num"><observablehq-loading></observablehq-loading><!--:ff626f9f:--></div>
+  </div>
+  <div class="card">
+    <h3>Median Salary</h3>
+    <div class="big-num"><observablehq-loading></observablehq-loading><!--:2d8bfb8b:--></div>
+  </div>
+  <div class="card">
+    <h3>Companies</h3>
+    <div class="big-num"><observablehq-loading></observablehq-loading><!--:c20ad208:--></div>
+  </div>
+  <div class="card">
+    <h3>Locations</h3>
+    <div class="big-num"><observablehq-loading></observablehq-loading><!--:eb4601c9:--></div>
+  </div>
 </div>
-<h2 id="degree" tabindex="-1"><a class="observablehq-header-anchor" href="#degree">∟ Degree</a></h2>
-<div class="card" style="background: none; padding: 20px;">
+<style>
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+.big-num {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2563eb;
+}
+.card h3 {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.filter-section {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+</style>
+<p>This data is sourced from <a href="https://www.reddit.com/r/biotech/comments/18vq4rw/rbiotech_salary_and_company_survey_2024/" target="_blank" rel="noopener noreferrer">Reddit's Biotech Compensation</a> survey (2022-2024).</p>
+<ul>
+<li><a href="https://docs.google.com/spreadsheets/d/1G0FmJhkOME_sv66hWmhnZS5qR2KMTY7nzkxksv46bfk/edit?gid=491268892#gid=491268892" target="_blank" rel="noopener noreferrer">Google Sheets Source</a></li>
+<li><a href="https://forms.gle/s68ExUmPVzhFAaWJ7" target="_blank" rel="noopener noreferrer">Contribute via Google Form</a></li>
+</ul>
+<hr>
+<h2 id="filters" tabindex="-1"><a class="observablehq-header-anchor" href="#filters">Filters</a></h2>
+<div class="observablehq observablehq--block"><!--:cd6b6ec9:--></div>
+<div class="observablehq observablehq--block"><!--:ea322662:--></div>
+<div class="observablehq observablehq--block"><!--:fc2b6d1f:--></div>
+<div class="observablehq observablehq--block"><!--:e00ddbb1:--></div>
+<div class="observablehq observablehq--block"><!--:15841e53:--></div>
+<div class="filter-section">
+  <div class="grid grid-cols-4">
+    <div><observablehq-loading></observablehq-loading><!--:52c1d7cf:--></div>
+    <div><observablehq-loading></observablehq-loading><!--:bb0b706b:--></div>
+    <div><observablehq-loading></observablehq-loading><!--:986eafb1:--></div>
+    <div><observablehq-loading></observablehq-loading><!--:39017042:--></div>
+  </div>
+  <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
+    Showing <strong><observablehq-loading></observablehq-loading><!--:7312051b:--></strong> of <observablehq-loading></observablehq-loading><!--:d5553701:--> records
+  </div>
+</div>
+<hr>
+<h2 id="compensation-by-experience" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation-by-experience">Compensation by Experience</a></h2>
+<div class="observablehq observablehq--block"><!--:7173f2bd:--></div>
+<div class="observablehq observablehq--block"><!--:3db8ef67:--></div>
+<div class="card">
+<observablehq-loading></observablehq-loading><!--:7f972c88:-->
+</div>
+<hr>
+<h2 id="compensation-by-degree" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation-by-degree">Compensation by Degree</a></h2>
+<div class="observablehq observablehq--block"><!--:817f124a:--></div>
+<div class="observablehq observablehq--block"><!--:bf6b3cf3:--></div>
+<div class="card">
 <observablehq-loading></observablehq-loading><!--:257ba2f3:-->
 </div>
-<h2 id="years-of-experience" tabindex="-1"><a class="observablehq-header-anchor" href="#years-of-experience">∟ Years of Experience</a></h2>
-<div class="observablehq observablehq--block"><!--:62832552:--></div>
-<div class="observablehq observablehq--block"><!--:a41c142d:--></div>
-<div class="observablehq observablehq--block"><!--:59112a8e:--></div>
-<div class="observablehq observablehq--block"><!--:0bd4952b:--></div>
-<div class="card" style="background: none; padding: 20px;">
-<observablehq-loading></observablehq-loading><!--:7f972c88:-->
-<observablehq-loading></observablehq-loading><!--:a95b3907:-->
-</div>
-<div class="observablehq observablehq--block"><!--:1d45ffef:--></div>
-<h2 id="location" tabindex="-1"><a class="observablehq-header-anchor" href="#location">∟ Location</a></h2>
-<div class="card" style="background: none; padding: 20px;">
+<hr>
+<h2 id="compensation-by-location" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation-by-location">Compensation by Location</a></h2>
+<div class="observablehq observablehq--block"><!--:37c0903a:--></div>
+<div class="observablehq observablehq--block"><!--:9f153343:--></div>
+<div class="card">
 <observablehq-loading></observablehq-loading><!--:2b7a343f:-->
 </div>
-<!-- ## ∟ Industry -->
-<div class="observablehq observablehq--block"><!--:fecf974e:--></div>
-<div class="card" style="background: none; padding: 20px;">
+<hr>
+<h2 id="compensation-by-industry" tabindex="-1"><a class="observablehq-header-anchor" href="#compensation-by-industry">Compensation by Industry</a></h2>
+<div class="observablehq observablehq--block"><!--:70d3b337:--></div>
+<div class="card">
 <observablehq-loading></observablehq-loading><!--:4badf542:-->
 </div>
-<div class="observablehq observablehq--block"><!--:db2fd934:--></div>
-<div class="observablehq observablehq--block"><!--:37b048ad:--></div>
-<div class="observablehq observablehq--block"><!--:50aa4a8e:--></div>
-<div class="observablehq observablehq--block"><!--:ff066a66:--></div>
-<div class="observablehq observablehq--block"><!--:5c9b9acb:--></div>
-<div class="observablehq observablehq--block"><!--:3c609e4a:--></div>
-<div class="observablehq observablehq--block"><!--:ed70f797:--></div>
-<!-- <div class="card" style="background: none; padding: 2px;">
-${Inputs.table(search_result)}
+<hr>
+<h2 id="data-table" tabindex="-1"><a class="observablehq-header-anchor" href="#data-table">Data Table</a></h2>
+<div class="observablehq observablehq--block"><!--:d3b415a1:--></div>
+<div class="card">
+<observablehq-loading></observablehq-loading><!--:060daaa1:-->
 </div>
-<div>
-${Inputs.table(degree_counts)}
-</div> -->
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./pe_hospitals"><span>PE Hospitals Tracker</span></a></nav>

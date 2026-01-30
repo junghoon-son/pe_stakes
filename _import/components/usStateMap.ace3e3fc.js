@@ -88,8 +88,8 @@ function countByStateName(data) {
  */
 export function usStateFraudMap(data, us, options = {}) {
   const {
-    width = 975,
-    height = 610,
+    width = 640,
+    height = 400,
     colorScheme = "OrRd",
     metric = "amount"
   } = options;
@@ -117,17 +117,23 @@ export function usStateFraudMap(data, us, options = {}) {
     ? d => `${d} cases`
     : d => `$${d3.format(".3s")(d).replace(/G/, "B")}`;
 
+  // Format for legend ticks
+  const tickFormat = metric === "count"
+    ? d => d
+    : d => `$${d3.format(".2s")(d).replace(/G/, "B")}`;
+
   return Plot.plot({
     width,
     height,
     projection: "albers-usa",
     color: {
       type: "quantize",
-      n: 9,
+      n: 5,
       domain: [0, d3.max(stateData.values())],
       scheme: colorScheme,
-      label: metric === "count" ? "Number of cases" : "Fraud amount",
-      legend: true
+      label: metric === "count" ? "Cases" : "Fraud amount",
+      legend: true,
+      tickFormat
     },
     marks: [
       Plot.geo(states, {

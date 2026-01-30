@@ -33,7 +33,7 @@ const abbrToStateName = Object.fromEntries(
  * Accepts both full name and abbreviation
  */
 function normalizeStateName(state) {
-  if (!state) return null;
+  if (!state || typeof state !== 'string') return null;
   // If it's an abbreviation, convert to full name
   if (state.length <= 3 && abbrToStateName[state.toUpperCase()]) {
     return abbrToStateName[state.toUpperCase()];

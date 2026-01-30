@@ -108,8 +108,9 @@ export function usStateFraudMap(data, us, options = {}) {
   const stateValues = new Map();
   states.features.forEach(feature => {
     const stateName = feature.properties.name;
+    const abbr = stateNameToAbbr[stateName] || stateName;
     const value = stateData.get(stateName) || 0;
-    stateValues.set(feature.id, { value, name: stateName });
+    stateValues.set(feature.id, { value, name: stateName, abbr });
   });
 
   // Format value for display
@@ -142,8 +143,18 @@ export function usStateFraudMap(data, us, options = {}) {
         strokeWidth: 0.5,
         title: d => {
           const info = stateValues.get(d.id);
-          return info ? `${info.name}\n${formatValue(info.value)}` : null;
+          return info ? `${info.name} (${info.abbr})\n${formatValue(info.value)}` : null;
         }
+      }),
+      // State abbreviation labels
+      Plot.text(states.features, {
+        x: d => d3.geoCentroid(d)[0],
+        y: d => d3.geoCentroid(d)[1],
+        text: d => stateValues.get(d.id)?.abbr,
+        fill: "#333",
+        fontSize: 8,
+        fontWeight: 500,
+        textAnchor: "middle"
       }),
       Plot.geo(statemesh, {
         stroke: "#fff",

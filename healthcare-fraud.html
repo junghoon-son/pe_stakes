@@ -1,23 +1,31 @@
 <!DOCTYPE html>
+<html>
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="generator" content="Observable Framework v1.11.0">
+<meta name="generator" content="Observable Framework v1.13.3">
 <title>Healthcare Fraud | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_import/custom-style.a4e887e4.css">
+<link rel="preload" as="style" href="./_import/custom-style.932d0abe.css">
 <link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_import/custom-style.a4e887e4.css">
+<link rel="stylesheet" type="text/css" href="./_import/custom-style.932d0abe.css">
 <link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
-<link rel="modulepreload" href="./_observablehq/client.abea4c62.js">
-<link rel="modulepreload" href="./_observablehq/runtime.5adf6409.js">
-<link rel="modulepreload" href="./_observablehq/stdlib.104bdab1.js">
+<link rel="modulepreload" href="./_observablehq/client.d432cce1.js">
+<link rel="modulepreload" href="./_observablehq/runtime.e080113b.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.aea91b37.js">
+<link rel="modulepreload" href="./_import/components/index.6f9d11e0.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.f865ba57.js">
+<link rel="modulepreload" href="./_import/components/yearHeatmap.1e8263f3.js">
+<link rel="modulepreload" href="./_import/components/fraudCard.df8ea991.js">
+<link rel="modulepreload" href="./_import/components/statsPanel.ce0fd59e.js">
+<link rel="modulepreload" href="./_import/components/charts.ee899069.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/0bada646.js">
 <link rel="modulepreload" href="./_npm/d3@7.9.0/7055d4c5.js">
 <link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/inputs.3eed7a9d.js">
-<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.14/0bada646.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/e95f898e.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/d44feff9.js">
 <link rel="modulepreload" href="./_npm/d3-brush@3.0.0/5830b12a.js">
@@ -48,45 +56,56 @@
 <link rel="modulepreload" href="./_npm/d3-timer@3.0.1/f31b5398.js">
 <link rel="modulepreload" href="./_npm/d3-transition@3.0.1/8debb4ba.js">
 <link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/4b0cc581.js">
-<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
 <link rel="modulepreload" href="./_npm/internmap@2.0.3/5eed35fd.js">
 <link rel="modulepreload" href="./_npm/delaunator@5.0.1/e67acb27.js">
-<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/8ac9039b.js">
 <script type="module">
 
-import {define} from "./_observablehq/client.abea4c62.js";
-import {registerFile} from "./_observablehq/stdlib.104bdab1.js";
+import {define} from "./_observablehq/client.d432cce1.js";
+import {registerFile} from "./_observablehq/stdlib.aea91b37.js";
 
-registerFile("./data/healthcare_frauds.json", {"name":"./data/healthcare_frauds.json","mimeType":"application/json","path":"./_file/data/healthcare_frauds.d0e712fd.json","lastModified":1719964677606,"size":190179});
+registerFile("./data/healthcare_frauds.json", {"name":"./data/healthcare_frauds.json","mimeType":"application/json","path":"./_file/data/healthcare_frauds.3bba4518.json","lastModified":1769748322673,"size":216086});
 
-define({id: "1662f5b4", inputs: ["Inputs","data"], outputs: ["search_input"], body: (Inputs,data) => {
+define({id: "9eb68401", outputs: ["fraudCardList","fraudStatsPanel","stateFraudAmountChart","stateCaseCountChart"], body: async () => {
+const {fraudCardList, fraudStatsPanel, stateFraudAmountChart, stateCaseCountChart} = await import("./_import/components/index.6f9d11e0.js");
+// Import shared components
+
+return {fraudCardList,fraudStatsPanel,stateFraudAmountChart,stateCaseCountChart};
+}});
+
+define({id: "7bb5f8bd", inputs: ["FileAttachment"], outputs: ["data"], body: (FileAttachment) => {
+// Load data
+const data = FileAttachment("./data/healthcare_frauds.json").json();
+return {data};
+}});
+
+define({id: "c2451566", inputs: ["Inputs","data","Generators"], outputs: ["search_input","search_result"], body: (Inputs,data,Generators) => {
+// Search input
 const search_input = Inputs.search(data, {placeholder: "Search cases"});
-return {search_input};
-}});
-
-define({id: "37480bfb", inputs: ["Generators","search_input"], outputs: ["search_result"], body: (Generators,search_input) => {
 const search_result = Generators.input(search_input);
-return {search_result};
+return {search_input,search_result};
 }});
 
-define({id: "297209c4", inputs: ["Inputs","data","Generators"], outputs: ["clinician_type_select","clinician_type"], body: (Inputs,data,Generators) => {
+define({id: "516d1363", inputs: ["Inputs","data","Generators"], outputs: ["clinician_type_select","clinician_type"], body: (Inputs,data,Generators) => {
 // Clinician Type selector
 const clinician_type_select = Inputs.select(
-    data.map((d) => d.clinicianType),
-    {
-        label: "Type", 
-        sort: true,
-        value: data.map((d) => d.clinicianType), 
-        multiple: 6,
-        width: 300,
-        unique: true}
-  );
-const clinician_type = Generators.input(clinician_type_select)
+  data.map((d) => d.clinicianType),
+  {
+    label: "Type",
+    sort: true,
+    value: data.map((d) => d.clinicianType),
+    multiple: 6,
+    width: 300,
+    unique: true
+  }
+);
+const clinician_type = Generators.input(clinician_type_select);
 return {clinician_type_select,clinician_type};
 }});
 
-define({id: "fd259028", inputs: ["search_result","clinician_type"], outputs: ["filtered_data"], body: (search_result,clinician_type) => {
+define({id: "f91b37fe", inputs: ["search_result","clinician_type"], outputs: ["filtered_data"], body: (search_result,clinician_type) => {
+// Filter data based on search and clinician type
 const filtered_data = search_result.filter(d => [...clinician_type].includes(d.clinicianType));
 return {filtered_data};
 }});
@@ -97,282 +116,33 @@ search_input
 ))
 }});
 
-define({id: "2fd66c27", outputs: ["aggregateData"], body: () => {
-const aggregateData = function(data) {
-  const aggregatedData = {};
-  data.forEach(item => {
-    if (aggregatedData[item.state]) {
-      aggregatedData[item.state] += item.fraudAmount;
-    } else {
-      aggregatedData[item.state] = item.fraudAmount;
-    }
-  });
-
-  // Convert the aggregated data to the desired array format
-  return Object.entries(aggregatedData).map(([state, fraudAmount]) => ({
-    state,
-    fraudAmount
-  }));
-}
-return {aggregateData};
-}});
-
-define({id: "3db4440c", outputs: ["countStates"], body: () => {
-const countStates = (statesArray) => {
-  const stateCounts = {};
-  
-  statesArray.forEach(item => {
-    const state = item.state;
-    if (stateCounts[state]) {
-      stateCounts[state]++;
-    } else {
-      stateCounts[state] = 1;
-    }
-  });
-  
-  return Object.entries(stateCounts).map(([state, count]) => ({ state, count }));
-};
-return {countStates};
-}});
-
-define({id: "1fbd8765", inputs: ["aggregateData","Plot","d3"], outputs: ["state_bar_plot"], body: (aggregateData,Plot,d3) => {
-const state_bar_plot = function(data) {
-  const aggregated_data = aggregateData(data)
-  return Plot.plot({
-    marginTop: 0,
-    paddingTop: 0,
-    paddingLeft: 10,
-    marginLeft: 80, 
-    marginRight: 50, 
-    marginBottom: 0,
-    height: 350,
-    // width: 300,
-    x: { axis: null },
-    y: { label: null },
-    style: {
-      fontSize: "1.0em",
-    },
-    color: {
-      scheme: "OrRd",
-      legend: false,
-    },
-    marks: [
-      Plot.barX(aggregated_data, {
-        x: "fraudAmount",
-        y: "state", 
-        fill: "fraudAmount",
-        sort: { y: "x", reverse: true, limit: 6 }
-      }),
-      Plot.text(aggregated_data, {
-        text: d => `$${d3.format(".3s")(d.fraudAmount).replace(/G/, "B")}`,
-        y: "state",
-        x: "fraudAmount",
-        textAnchor: "start",
-        dx: 3,
-        fill: "black"
-      })
-    ]
-  })}
-return {state_bar_plot};
-}});
-
-define({id: "86d40b29", inputs: ["countStates","Plot"], outputs: ["state_count_plot"], body: (countStates,Plot) => {
-const state_count_plot = function(data) {
-  const counts_data = countStates(data)
-  return Plot.plot({
-    marginTop: 0,
-    paddingTop: 0,
-    paddingLeft: 10,
-    marginLeft: 80, 
-    marginRight: 50, 
-    marginBottom: 0,
-    height: 350,
-    // width: 300,
-    x: { axis: null },
-    y: { label: null},
-    style: {
-      fontSize: "1.0em",
-    },
-    color: {
-      scheme: "OrRd",
-      legend: false,
-    },
-    marks: [
-      Plot.barX(counts_data, {
-        x: "count",
-        y: "state", 
-        fill: "count",
-        sort: { y: "x", reverse: true, 
-        limit: 6
-        }
-      }),
-      Plot.text(counts_data, {
-        text: 'count',
-        y: "state",
-        x: "count",
-        textAnchor: "start",
-        dx: 3,
-        fill: "black"
-      })
-    ]
-  })}
-return {state_count_plot};
-}});
-
-define({id: "2f22d880", mode: "inline", inputs: ["d3","filtered_data","display"], body: async (d3,filtered_data,display) => {
+define({id: "8b7b4d1d", mode: "inline", inputs: ["fraudStatsPanel","filtered_data","display"], body: async (fraudStatsPanel,filtered_data,display) => {
 display(await(
-d3.format(".3s")(filtered_data.reduce((total, item) => {
-      return (total + (Number(item.fraudAmount)) || 0);
-    }, 0)).replace(/G/, "B")
+fraudStatsPanel(filtered_data)
 ))
 }});
 
-define({id: "aa4f11c4", mode: "inline", inputs: ["filtered_data","display"], body: async (filtered_data,display) => {
+define({id: "513946b3", mode: "inline", inputs: ["stateFraudAmountChart","filtered_data","display"], body: async (stateFraudAmountChart,filtered_data,display) => {
 display(await(
-filtered_data.length
+stateFraudAmountChart(filtered_data)
 ))
 }});
 
-define({id: "d234b236", mode: "inline", inputs: ["filtered_data","display"], body: async (filtered_data,display) => {
+define({id: "1b1a0fe4", mode: "inline", inputs: ["stateCaseCountChart","filtered_data","display"], body: async (stateCaseCountChart,filtered_data,display) => {
 display(await(
-[...new Set(filtered_data.map(item => item.state))].length
+stateCaseCountChart(filtered_data)
 ))
 }});
 
-define({id: "32f860f1", mode: "inline", inputs: ["state_bar_plot","filtered_data","display"], body: async (state_bar_plot,filtered_data,display) => {
+define({id: "18a3ebc4", mode: "inline", inputs: ["fraudCardList","filtered_data","display"], body: async (fraudCardList,filtered_data,display) => {
 display(await(
-state_bar_plot(filtered_data)
-))
-}});
-
-define({id: "3472a8eb", mode: "inline", inputs: ["state_count_plot","filtered_data","display"], body: async (state_count_plot,filtered_data,display) => {
-display(await(
-state_count_plot(filtered_data)
-))
-}});
-
-define({id: "3b222a77", inputs: ["d3","Plot"], outputs: ["yearHeatmap"], body: (d3,Plot) => {
-const yearHeatmap = function(startYear, endYear, highlightStart, highlightEnd) {
-  const years = d3.range(startYear, endYear + 1);
-  const data = years.map(year => ({
-    year,
-    highlight: year >= highlightStart && year <= highlightEnd
-  }));
-  return Plot.plot({
-    height: 25,
-    // width: Math.min(800, window.innerWidth - 20),
-    x: {
-      type: "band", 
-      domain: years, 
-      padding: 0,
-      label: null,  // Remove X-axis title
-      tickSize: 0,  // Remove tick marks
-      tickPadding: 3,  // Remove padding between ticks and labels
-      tickFormat: d => d.toString()
-    },
-    y: {
-      domain: [0, 1], 
-      padding: 2,
-      axis: null
-    },
-    color: {
-      domain: [false, true],
-      range: ["#f0f0f0", "#3182bd"]  // Light gray for non-highlighted, blue for highlighted
-    },
-    marks: [
-      Plot.cell(data, {
-        x: "year",
-        fill: d => d.highlight,
-        title: d => `Year: ${d.year}${d.highlight ? " (Highlighted)" : ""}`,
-        stroke: "white",
-        strokeWidth: 1
-      }),
-    ],
-    style: {
-      backgroundColor: "white",
-      fontSize: "9px",
-      fontColor: "#f0f0f0"
-    },
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 0,
-    marginBottom: 10  // Add some bottom margin for year labels
-  });
-}
-return {yearHeatmap};
-}});
-
-define({id: "970e0c04", inputs: ["html","d3","yearHeatmap"], outputs: ["cardTemplate"], body: (html,d3,yearHeatmap) => {
-const cardTemplate = (data) => html`<div class="fraud-card">
-    <div class="card-header">
-        <div class="case-title">${data.title}</div>
-        <div class="case-number">${data.caseNumber}</div>
-    </div>
-    <div class="card-content">
-        <div class="main-content">
-            <div class="state-container">
-                <span class="badge state-badge">${data.state}</span>
-            </div>
-            <div class="battle-container">
-                    <div class="party-card winner">
-                        <span class="party-label">Plaintiff:</span>
-                        <div>${data.plaintiff}</div>
-                    </div>
-                    <div class="party-card">
-                        <span class="party-label">Defendant:</span>
-                        <div><span class="key-entity">${data.defendant ? (Array.isArray(data.defendant) ? data.defendant.join(', ') : data.defendant) : 'No defendant'}</span></div>
-                    </div>
-                </div>
-            <div class="summary">
-                ${data.summary}
-            </div>
-        </div>
-        <div class="number-column">
-            <div class="category">${data.category}</div>
-            <div class="fraud-amount-container">
-                <div class="number-label">Alleged Fraud</div>
-                <div class="fraud-amount">$${d3.format(".2s")(data.fraudAmount).replace(/G/, "B")}</div>
-            </div>
-            <!-- <div class="number-label">${data.affectedLabel}</div> !-->
-            <div>${data.affectedCount}</div>
-            <h4>Related:</h4>
-            <div class="related-links">
-                ${data.relatedLinks.map(link => html`
-                    <a href="${link.url}" class="related-link">${link.text}</a>
-                `)}
-            </div>
-        </div>
-    </div>
-    <div class="card-footer">
-        <div class="comment-content">
-        ${data.commentary ? (Array.isArray(data.commentary) ? data.commentary.map(c => html`
-            <div class="comment-admonition">
-                ${c.comment} <b style="text-align: right;">- ${c.added_by}</b>
-            </div>
-        </div>`): data.commentary) : "" }
-    </div>
-    <div class="card-footer">
-        <div class="timeline">
-            <h4>Fraud Years:</h4>
-            ${yearHeatmap(2014, 2024, data.timeline.start_year, data.timeline.end_year)}
-        </div>
-    </div>
-</div>`;
-return {cardTemplate};
-}});
-
-define({id: "72741959", inputs: ["FileAttachment"], outputs: ["data"], body: (FileAttachment) => {
-const data = FileAttachment("./data/healthcare_frauds.json").json();
-return {data};
-}});
-
-define({id: "4c253b46", mode: "inline", inputs: ["filtered_data","cardTemplate","display"], body: async (filtered_data,cardTemplate,display) => {
-display(await(
-filtered_data.map(entry => cardTemplate(entry))
+fraudCardList(filtered_data, { timelineStartYear: 2014, timelineEndYear: 2026 })
 ))
 }});
 
 </script>
+</head>
+<body>
 <input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
 <label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
 <nav id="observablehq-sidebar">
@@ -407,7 +177,8 @@ filtered_data.map(entry => cardTemplate(entry))
     </ol>
   </details>
 </nav>
-<script>{Object.assign(document.createElement("a"),{href:""}).password&&location.replace(location.href);const e=document.querySelector("#observablehq-sidebar"),t=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?t.checked=r==="true":t.indeterminate=!0;for(const o of document.querySelectorAll("#observablehq-sidebar summary")){const s=o.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${o.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
 <aside id="observablehq-toc" data-selector="h1:not(:first-of-type)[id], h2:first-child[id], :not(h1) + h2[id]">
 <nav>
 <div>Contents</div>
@@ -420,65 +191,45 @@ filtered_data.map(entry => cardTemplate(entry))
 </ol>
 </nav>
 </aside>
-<div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
 <h1> Healthcare Fraud: Criminal Cases</h1>
 <hr>
 <h2 id="intro" tabindex="-1"><a class="observablehq-header-anchor" href="#intro">Intro</a></h2>
 <p style="font-size: 0.8em;">Healthcare Fraud Database is a comprehensive resource compiling information on fraudulent activities within the healthcare industry. Based on my experience in healthcare startup, interactions with investors, executives, much of the fraud is overlooked as "part of business". This database serves as a centralized repository of reported cases and schemes, sourced primarily from news articles, press releases, Department of Justice reports, and Federal Trade Commission announcements. This website is currently work-in-progress, as the data validation is ongoing.
 <span style="font-size: 1em;"><a href="https://www.linkedin.com/in/jung-hoon-son/" target="_blank" rel="noopener noreferrer">Jung Hoon Son, M.D.</a></span></p>
-<div class="observablehq observablehq--block"><!--:1662f5b4:--></div>
-<div class="observablehq observablehq--block"><!--:37480bfb:--></div>
-<div class="observablehq observablehq--block"><!--:297209c4:--></div>
-<div class="observablehq observablehq--block"><!--:fd259028:--></div>
+<div class="observablehq observablehq--block"><!--:9eb68401:--></div>
+<div class="observablehq observablehq--block"><!--:7bb5f8bd:--></div>
+<div class="observablehq observablehq--block"><!--:c2451566:--></div>
+<div class="observablehq observablehq--block"><!--:516d1363:--></div>
+<div class="observablehq observablehq--block"><!--:f91b37fe:--></div>
 <hr>
 <h2 id="search-cases" tabindex="-1"><a class="observablehq-header-anchor" href="#search-cases">Search Cases</a></h2>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:203f9938:--></div>
 <hr>
 <h2 id="statistics" tabindex="-1"><a class="observablehq-header-anchor" href="#statistics">Statistics</a></h2>
-<div class="observablehq observablehq--block"><!--:2fd66c27:--></div>
-<div class="observablehq observablehq--block"><!--:3db4440c:--></div>
-<div class="observablehq observablehq--block"><!--:1fbd8765:--></div>
-<div class="observablehq observablehq--block"><!--:86d40b29:--></div>
 <div>
-  <div class="stats-container">
-      <div class="big-number-card">
-          <div class="big-number">$<observablehq-loading></observablehq-loading><!--:2f22d880:--></div>
-          <div class="big-number-caption">Total Fraud Amount</div>
-      </div>
-      <div class="big-number-card">
-          <div class="big-number"><observablehq-loading></observablehq-loading><!--:aa4f11c4:--></div>
-          <div class="big-number-caption">Cases</div>
-      </div>
-      <div class="big-number-card">
-          <div class="big-number"><observablehq-loading></observablehq-loading><!--:d234b236:--></div>
-          <div class="big-number-caption">Unique States</div>
-      </div>
-  </div>
+<observablehq-loading></observablehq-loading><!--:8b7b4d1d:-->
 </div>
 <hr>
 <div class="grid grid-cols-4">
   <div>
-    <h3>Top Fraud Amount (by State)</h3><observablehq-loading></observablehq-loading><!--:32f860f1:-->
+    <h3>Top Fraud Amount (by State)</h3><observablehq-loading></observablehq-loading><!--:513946b3:-->
   </div>
   <div>
-    <h3>Top Cases (by State)</h3><observablehq-loading></observablehq-loading><!--:3472a8eb:-->
+    <h3>Top Cases (by State)</h3><observablehq-loading></observablehq-loading><!--:1b1a0fe4:-->
   </div>
 </div>
-<div class="observablehq observablehq--block"><!--:3b222a77:--></div>
-<!-- ### ${filtered_data.length} Cases Found -->
 <hr>
 <h2 id="case-details" tabindex="-1"><a class="observablehq-header-anchor" href="#case-details">Case Details</a></h2>
-<div class="observablehq observablehq--block"><!--:970e0c04:--></div>
-<div class="observablehq observablehq--block"><!--:72741959:--></div>
-<p><observablehq-loading></observablehq-loading><!--:4c253b46:--></p>
+<p><observablehq-loading></observablehq-loading><!--:18a3ebc4:--></p>
 <h2 id="references" tabindex="-1"><a class="observablehq-header-anchor" href="#references">References</a></h2>
 <ul>
-<li>2023 National Health Care Fraud Enforcement Action</li>
+<li><a href="https://www.justice.gov/criminal/criminal-fraud/2025-national-health-care-fraud-takedown" target="_blank" rel="noopener noreferrer">2025 National Health Care Fraud Takedown</a> - 324 defendants, $14.6B alleged fraud</li>
+<li><a href="https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit/2024-national-health-care-fraud-enforcement-action" target="_blank" rel="noopener noreferrer">2024 National Health Care Fraud Enforcement Action</a> - 193 defendants, $2.75B alleged fraud</li>
+<li><a href="https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit/2023-case-summaries" target="_blank" rel="noopener noreferrer">2023 National Health Care Fraud Enforcement Action</a></li>
 <li>2023 COVID-19 Enforcement Action</li>
 <li>2022 Opioid Enforcement Action</li>
 <li>2022 Telemedicine Enforcement Action</li>
-<li><a href="https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit/2023-case-summaries" target="_blank" rel="noopener noreferrer">2022 COVID-19 Enforcement Action</a></li>
 <li><a href="https://www.justice.gov/criminal-fraud/health-care-fraud-unit/covid-19-health-care-fraud-enforcement-action" target="_blank" rel="noopener noreferrer">2021 National Health Care Fraud Enforcement Action</a></li>
 </ul>
 </main>
@@ -487,3 +238,5 @@ filtered_data.map(entry => cardTemplate(entry))
 <div>Built with Observable.</div>
 </footer>
 </div>
+</body>
+</html>

@@ -2497,7 +2497,16 @@
         "label": "Metpath (clinical laboratory in Parsippany, New Jersey)"
       }
     ],
-    "summary": "Six individuals from New Jersey were charged by criminal complaint with conspiracy to violate the Federal Anti-Kickback Statute for their alleged roles in a scheme to defraud Medicare. The scheme involved paying over $250,000 in illegal kickbacks and bribes for laboratory tests for COVID-19 pathogen tests. Abid Syed and Tariq Din owned Metpath, a clinical laboratory that performed and billed Medicare for COVID-19 diagnostic testing. Tauqir Khan, Tamer Mohamed, and Nisim Davydov were marketers who supplied thousands of COVID-19 diagnostic tests to Metpath and received kickbacks. Abdul Rauf allegedly helped conceal the kickback payments through shell companies. The case is being prosecuted by Assistant U.S. Attorney DeNae Thomas of the Health Care Fraud Unit of the U.S. Attorney's Office for the District of New Jersey.",
+    "summary": "Six individuals from New Jersey were charged by criminal complaint with conspiracy to violate the Federal Anti-Kickback Statute for their alleged roles in a scheme to defraud Medicare. The scheme involved paying over $250,000 in illegal kickbacks and bribes for laboratory tests for COVID-19 pathogen tests. Abid Syed and Tariq Din owned Metpath, a clinical laboratory that performed and billed Medicare for COVID-19 diagnostic testing. Tauqir Khan, Tamer Mohamed, and Nisim Davydov were marketers who supplied thousands of COVID-19 diagnostic tests to Metpath and received kickbacks. Abdul Rauf was originally charged with helping conceal kickback payments through shell companies; however, the criminal complaint against Rauf was formally dismissed by the U.S. District Court for the District of New Jersey on August 3, 2023, pursuant to Rule 48(a) of the Federal Rules of Criminal Procedure. No conviction resulted and no prosecution is pending against Rauf. The case is being prosecuted by Assistant U.S. Attorney DeNae Thomas of the Health Care Fraud Unit of the U.S. Attorney's Office for the District of New Jersey.",
+    "dismissals": [
+      {
+        "defendant": "Abdul Rauf",
+        "date": "2023-08-03",
+        "court": "U.S. District Court for the District of New Jersey",
+        "basis": "Rule 48(a) of the Federal Rules of Criminal Procedure",
+        "note": "Criminal complaint formally dismissed. No conviction resulted and no prosecution is pending."
+      }
+    ],
     "timeline": {
       "start_year": 2020,
       "end_year": 2024

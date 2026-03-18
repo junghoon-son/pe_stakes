@@ -53,11 +53,22 @@ export function fraudCard(data, options = {}) {
       `)
     : "";
 
+  const dismissalHtml = data.dismissals && Array.isArray(data.dismissals) && data.dismissals.length > 0
+    ? data.dismissals.map(d => html`
+        <div class="dismissal-banner">
+          <strong>CASE DISMISSED — ${d.defendant}</strong><br>
+          Dismissed on ${d.date} by ${d.court}.<br>
+          <em>${d.note}</em>
+        </div>
+      `)
+    : "";
+
   return html`<div class="fraud-card">
     <div class="card-header">
       <div class="case-title">${data.title}</div>
       <div class="case-number">${data.caseNumber}</div>
     </div>
+    ${dismissalHtml}
     <div class="card-content">
       <div class="main-content">
         <div class="state-container">

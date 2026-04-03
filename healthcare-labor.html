@@ -13,15 +13,12 @@
 <link rel="modulepreload" href="./_observablehq/runtime.js">
 <link rel="modulepreload" href="./_observablehq/stdlib.js">
 <link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/duckdb.js">
 <link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
 <link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
 <link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/_esm.js">
-<link rel="modulepreload" href="./_npm/@duckdb/duckdb-wasm@1.28.0/_esm.js">
 <link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
 <link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
-<link rel="modulepreload" href="./_npm/apache-arrow@21.1.0/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-array@3.2.4/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-axis@3.0.0/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-brush@3.0.0/_esm.js">
@@ -52,53 +49,149 @@
 <link rel="modulepreload" href="./_npm/d3-transition@3.0.1/_esm.js">
 <link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/_esm.js">
 <link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
-<link rel="modulepreload" href="./_npm/tslib@2.8.1/_esm.js">
-<link rel="modulepreload" href="./_npm/flatbuffers@25.9.23/_esm.js">
 <link rel="modulepreload" href="./_npm/internmap@2.0.3/_esm.js">
 <link rel="modulepreload" href="./_npm/delaunator@5.1.0/_esm.js">
 <link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/_esm.js">
 <script type="module">
 
 import {define} from "./_observablehq/client.js";
-import {registerFile, FileAttachment} from "./_observablehq/stdlib.js";
-import {registerTable} from "./_observablehq/stdlib/duckdb.js";
+import {registerFile} from "./_observablehq/stdlib.js";
 
+registerFile("./data/healthcare_labor_trends.csv", {"name":"./data/healthcare_labor_trends.csv","mimeType":"text/csv","path":"./_file/data/healthcare_labor_trends.35506eaa.csv","lastModified":1775190329509});
 registerFile("./data/oes/processed/naics_lookup_from_data.csv", {"name":"./data/oes/processed/naics_lookup_from_data.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/naics_lookup_from_data.0a57814f.csv","lastModified":1720724332694});
 registerFile("./data/oes/processed/occ_code.csv", {"name":"./data/oes/processed/occ_code.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/occ_code.6848eccf.csv","lastModified":1720323702095});
-registerFile("./data/oes/processed/oes_longitudinal_slim.parquet", {"name":"./data/oes/processed/oes_longitudinal_slim.parquet","path":"./_file/data/oes/processed/oes_longitudinal_slim.30d9d5bc.parquet","lastModified":1720323702068});
-registerTable("oes_db", FileAttachment("./data/oes/processed/oes_longitudinal_slim.parquet"));
 
-define({id: "b6ed26fa", inputs: ["FileAttachment"], outputs: ["occ_codes","naics_lookup"], body: (FileAttachment) => {
+define({id: "5f48620c", inputs: ["FileAttachment"], outputs: ["occ_codes","naics_lookup","raw_data"], body: (FileAttachment) => {
 const occ_codes = FileAttachment("./data/oes/processed/occ_code.csv").csv()
 const naics_lookup = FileAttachment("./data/oes/processed/naics_lookup_from_data.csv").csv()
-return {occ_codes,naics_lookup};
+const raw_data = FileAttachment("./data/healthcare_labor_trends.csv").csv({typed: true})
+return {occ_codes,naics_lookup,raw_data};
 }});
 
-define({id: "0deddbdb", inputs: ["Inputs","occ_codes"], outputs: ["occ_code_search_input"], body: (Inputs,occ_codes) => {
-const occ_code_search_input = Inputs.search(occ_codes, {width: 100})
-return {occ_code_search_input};
+define({id: "56b0038b", inputs: ["occ_codes"], outputs: ["lookup_occ_title"], body: (occ_codes) => {
+const lookup_occ_title = occ_code => 
+  occ_codes.find(({ OCC_CODE }) => OCC_CODE === occ_code)?.OCC_TITLE;
+return {lookup_occ_title};
 }});
 
-define({id: "90b4ba8e", inputs: ["Generators","occ_code_search_input"], outputs: ["occ_code_search"], body: (Generators,occ_code_search_input) => {
-const occ_code_search = Generators.input(occ_code_search_input)
-return {occ_code_search};
+define({id: "1d499008", inputs: ["naics_lookup"], outputs: ["lookup_naics_title"], body: (naics_lookup) => {
+const lookup_naics_title = naics_code => 
+  naics_lookup.find(({ NAICS }) => NAICS === naics_code)?.NAICS_TITLE ?? naics_code;
+return {lookup_naics_title};
 }});
 
-define({id: "5853914b", inputs: ["Inputs","occ_code_search"], outputs: ["occ_code_table_input"], body: (Inputs,occ_code_search) => {
-const occ_code_table_input = Inputs.table(
-    occ_code_search,
-)
-return {occ_code_table_input};
+define({id: "49b9fbab", inputs: ["raw_data"], outputs: ["get_naics_counts"], body: (raw_data) => {
+function get_naics_counts(selected_codes, grouping_limit = 5) {
+  // Filter to selected OCC_CODEs
+  const filtered = raw_data.filter(d => selected_codes.includes(d.OCC_CODE));
+
+  // Aggregate by REPORT_DATE + NAICS
+  const byDateNaics = new Map();
+  for (const d of filtered) {
+    const key = `${d.REPORT_DATE}|${d.NAICS}`;
+    if (!byDateNaics.has(key)) {
+      byDateNaics.set(key, {REPORT_DATE: d.REPORT_DATE, NAICS: d.NAICS, NAICS_TITLE: d.NAICS_TITLE, total_employment: 0});
+    }
+    byDateNaics.get(key).total_employment += (d.TOT_EMP || 0);
+  }
+
+  // Rank NAICS by all-time total employment
+  const naicsTotals = new Map();
+  for (const d of byDateNaics.values()) {
+    naicsTotals.set(d.NAICS, (naicsTotals.get(d.NAICS) || 0) + d.total_employment);
+  }
+  const topNaics = new Set(
+    [...naicsTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, grouping_limit)
+      .map(d => d[0])
+  );
+
+  // Group: top N keep their NAICS, rest become "Other"
+  const finalMap = new Map();
+  for (const d of byDateNaics.values()) {
+    const isTop = topNaics.has(d.NAICS);
+    const naics = isTop ? d.NAICS : "Other";
+    const naicsTitle = isTop ? d.NAICS_TITLE : "Other Industries";
+    const key = `${d.REPORT_DATE}|${naics}`;
+    if (!finalMap.has(key)) {
+      finalMap.set(key, {REPORT_DATE: d.REPORT_DATE, NAICS: naics, NAICS_TITLE: naicsTitle, total_employment: 0});
+    }
+    finalMap.get(key).total_employment += d.total_employment;
+  }
+
+  return [...finalMap.values()].sort((a, b) => {
+    if (a.REPORT_DATE !== b.REPORT_DATE) return a.REPORT_DATE < b.REPORT_DATE ? -1 : 1;
+    if (a.NAICS === "Other") return 1;
+    if (b.NAICS === "Other") return -1;
+    return b.total_employment - a.total_employment;
+  });
+}
+return {get_naics_counts};
 }});
 
-define({id: "2229528f", inputs: ["Generators","occ_code_table_input"], outputs: ["occ_code_table_input_results"], body: (Generators,occ_code_table_input) => {
-const occ_code_table_input_results = Generators.input(occ_code_table_input)
-return {occ_code_table_input_results};
-}});
+define({id: "c3a26ed1", inputs: ["Plot","lookup_naics_title"], outputs: ["counts_plot"], body: (Plot,lookup_naics_title) => {
+const counts_plot = function(data) {
+    // Compute YoY % change per date
+    const totalByDate = new Map();
+    for (const d of data) {
+      totalByDate.set(d.REPORT_DATE, (totalByDate.get(d.REPORT_DATE) || 0) + d.total_employment);
+    }
+    const sortedDates = [...totalByDate.keys()].sort();
+    const yoyMap = new Map();
+    for (let i = 0; i < sortedDates.length; i++) {
+      if (i === 0) { yoyMap.set(sortedDates[i], null); continue; }
+      const prev = totalByDate.get(sortedDates[i - 1]);
+      const curr = totalByDate.get(sortedDates[i]);
+      yoyMap.set(sortedDates[i], prev > 0 ? ((curr - prev) / prev * 100) : null);
+    }
 
-define({id: "7c4200c9", inputs: ["occ_code_table_input_results"], outputs: ["selected_codes"], body: (occ_code_table_input_results) => {
-const selected_codes = occ_code_table_input_results.map(d => d.OCC_CODE)
-return {selected_codes};
+    return Plot.plot({
+        paddingLeft: 10,
+        marginLeft: 70, 
+        marginRight: 50, 
+        marginBottom: 60,
+        fontSize: 10,
+        width: 1000,
+        color: {
+            legend: true,
+            scheme: "Tableau10"
+        },
+        x: {
+          type: "band",
+          tickFormat: (d) => {
+            const date = new Date(d);
+            return `${date.getFullYear()}-${date.toLocaleString('en', {month: 'short'})}`;
+          },
+          tickRotate: -45
+        },
+        y: {
+          label: "↑ Total Employment",
+          grid: true
+        },
+        marks: [
+            Plot.barY(data, {
+                x: "REPORT_DATE",
+                y: "total_employment", 
+                fill: (d) => lookup_naics_title(d.NAICS),
+                tip: true,
+                title: (d) => `${d.NAICS_TITLE}: (${d.NAICS})\nEmployment: ${d.total_employment.toLocaleString()}`
+            }),
+            Plot.text(
+              sortedDates.filter(d => yoyMap.get(d) !== null),
+              {
+                x: (d) => d,
+                y: (d) => totalByDate.get(d),
+                dy: -8,
+                text: (d) => `${yoyMap.get(d) >= 0 ? "+" : ""}${yoyMap.get(d).toFixed(1)}%`,
+                fontSize: 9,
+                fill: (d) => yoyMap.get(d) >= 0 ? "#2a7" : "#c33"
+              }
+            ),
+            Plot.ruleY([0])
+        ]
+    })}
+return {counts_plot};
 }});
 
 define({id: "97065f6d", inputs: ["Inputs"], outputs: ["grouping_limit_input"], body: (Inputs) => {
@@ -141,9 +234,9 @@ const physicians = [
 return {physicians};
 }});
 
-define({id: "412d3569", mode: "inline", inputs: ["counts_plot","get_naics_counts","physicians","grouping_limit","display"], body: async (counts_plot,get_naics_counts,physicians,grouping_limit,display) => {
+define({id: "99ba7153", mode: "inline", inputs: ["counts_plot","get_naics_counts","physicians","grouping_limit","display"], body: async (counts_plot,get_naics_counts,physicians,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(physicians, grouping_limit))
+counts_plot(get_naics_counts(physicians, grouping_limit))
 ))
 }});
 
@@ -161,9 +254,9 @@ const nurses = [
 return {nurses};
 }});
 
-define({id: "7de05ca3", mode: "inline", inputs: ["counts_plot","get_naics_counts","nurses","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nurses,grouping_limit,display) => {
+define({id: "9ffe7fa9", mode: "inline", inputs: ["counts_plot","get_naics_counts","nurses","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nurses,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(nurses, grouping_limit))
+counts_plot(get_naics_counts(nurses, grouping_limit))
 ))
 }});
 
@@ -180,9 +273,9 @@ const nurse_practioners = [
 return {nurse_practioners};
 }});
 
-define({id: "cf431e10", mode: "inline", inputs: ["counts_plot","get_naics_counts","nurse_practioners","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nurse_practioners,grouping_limit,display) => {
+define({id: "e5a4250f", mode: "inline", inputs: ["counts_plot","get_naics_counts","nurse_practioners","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nurse_practioners,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(nurse_practioners, grouping_limit))
+counts_plot(get_naics_counts(nurse_practioners, grouping_limit))
 ))
 }});
 
@@ -192,20 +285,17 @@ nurse_practioners.map(d => html`<li style="font-size: 0.8em"><a href="https://ww
 ))
 }});
 
-define({id: "059e1e71", outputs: ["nursing_assistants"], body: () => {
+define({id: "4c5441d2", outputs: ["nursing_assistants"], body: () => {
 const nursing_assistants = [
-    // "29-2061",  // LVN
-    // "29-1151",  // Nurse Anesthetist
-    // "31-1010",  // Nursing, Psychiatric, and Home Health Aides
     "31-1014",  // Nursing Assistants
     "31-1131",  // Nursing Assistants
 ]
 return {nursing_assistants};
 }});
 
-define({id: "28413580", mode: "inline", inputs: ["counts_plot","get_naics_counts","nursing_assistants","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nursing_assistants,grouping_limit,display) => {
+define({id: "65b7ace3", mode: "inline", inputs: ["counts_plot","get_naics_counts","nursing_assistants","grouping_limit","display"], body: async (counts_plot,get_naics_counts,nursing_assistants,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(nursing_assistants, grouping_limit))
+counts_plot(get_naics_counts(nursing_assistants, grouping_limit))
 ))
 }});
 
@@ -222,9 +312,9 @@ const physian_assistant = [
 return {physian_assistant};
 }});
 
-define({id: "5f58d673", mode: "inline", inputs: ["counts_plot","get_naics_counts","physian_assistant","grouping_limit","display"], body: async (counts_plot,get_naics_counts,physian_assistant,grouping_limit,display) => {
+define({id: "556f8150", mode: "inline", inputs: ["counts_plot","get_naics_counts","physian_assistant","grouping_limit","display"], body: async (counts_plot,get_naics_counts,physian_assistant,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(physian_assistant, grouping_limit))
+counts_plot(get_naics_counts(physian_assistant, grouping_limit))
 ))
 }});
 
@@ -234,20 +324,16 @@ physian_assistant.map(d => html`<li style="font-size: 0.8em"><a href="https://ww
 ))
 }});
 
-define({id: "d728c679", outputs: ["crna"], body: () => {
+define({id: "b005401e", outputs: ["crna"], body: () => {
 const crna = [
-    // "29-2061",  // LVN
     "29-1151",  // Nurse Anesthetist
-    // "31-1010",  // Nursing, Psychiatric, and Home Health Aides
-    // "31-1014",  // Nursing Assistants
-    // "31-1131",  // Nursing Assistants
 ]
 return {crna};
 }});
 
-define({id: "d28b79e2", mode: "inline", inputs: ["counts_plot","get_naics_counts","crna","grouping_limit","display"], body: async (counts_plot,get_naics_counts,crna,grouping_limit,display) => {
+define({id: "05fcfaa9", mode: "inline", inputs: ["counts_plot","get_naics_counts","crna","grouping_limit","display"], body: async (counts_plot,get_naics_counts,crna,grouping_limit,display) => {
 display(await(
-counts_plot(await get_naics_counts(crna, grouping_limit))
+counts_plot(get_naics_counts(crna, grouping_limit))
 ))
 }});
 
@@ -255,141 +341,6 @@ define({id: "f9d766ed", mode: "inline", inputs: ["crna","html","lookup_occ_title
 display(await(
 crna.map(d => html`<li style="font-size: 0.8em"><a href="https://www.bls.gov/oes/current/oes${d.replace('-','')}.htm">${d}: ${lookup_occ_title(d)}</a></li>`)
 ))
-}});
-
-define({id: "8bbd7fd6", inputs: ["Plot","lookup_occ_title","lookup_naics_title"], outputs: ["counts_plot"], body: (Plot,lookup_occ_title,lookup_naics_title) => {
-const counts_plot = function(data) {
-    return Plot.plot({
-        // marginTop: 0,
-        // paddingTop: 0,
-        paddingLeft: 10,
-        marginLeft: 70, 
-        marginRight: 50, 
-        marginBottom: 30,
-        // height: 350,
-        fontSize: 10,
-        width: 1000,
-        color: {
-            legend: true,
-            scheme: "Tableau10"
-        },
-        legend: {
-            tickFormat: lookup_occ_title
-        },
-        x: {
-          type: "band"
-        },
-        // facet: {data, x: "NAICS", marginRight: 90},
-        marks: [
-            Plot.barY(data, {
-                x: (d) => new Date(d.REPORT_DATE),
-                y: "total_employment", 
-                fill: (d) => lookup_naics_title(d.NAICS),
-                tip: true,
-                title: (d) => `${d.NAICS_TITLE}: (${d.NAICS})\n\nEmployment: ${d.total_employment}`
-            }),
-            Plot.ruleY([0])
-        ]
-    })}
-return {counts_plot};
-}});
-
-define({id: "736097ba", inputs: ["selected_codes"], outputs: ["selected_codes_str"], body: (selected_codes) => {
-// Join selected codes, turn it into SQL-compatible string. Inefficient but works
-const selected_codes_str = "\'" + selected_codes.join("','") + "\'"
-return {selected_codes_str};
-}});
-
-define({id: "f0fa738e", outputs: ["sql_array_str"], body: () => {
-const sql_array_str = function (code_array) {
-    const selected_codes_str = "\'" + code_array.join("','") + "\'"
-    return selected_codes_str
-}
-return {sql_array_str};
-}});
-
-define({id: "56b0038b", inputs: ["occ_codes"], outputs: ["lookup_occ_title"], body: (occ_codes) => {
-const lookup_occ_title = occ_code => 
-  occ_codes.find(({ OCC_CODE }) => OCC_CODE === occ_code)?.OCC_TITLE;
-return {lookup_occ_title};
-}});
-
-define({id: "1d499008", inputs: ["naics_lookup"], outputs: ["lookup_naics_title"], body: (naics_lookup) => {
-const lookup_naics_title = naics_code => 
-  naics_lookup.find(({ NAICS }) => NAICS === naics_code)?.NAICS_TITLE ?? naics_code;
-return {lookup_naics_title};
-}});
-
-define({id: "8b1cd534", inputs: ["sql","sql_array_str"], outputs: ["get_naics_counts"], body: (sql,sql_array_str) => {
-const get_naics_counts = async function (selected_codes, grouping_limit=5) {
-  const naics_occ_count = await sql([
-    `WITH all_time_ranked_data AS (
-  SELECT 
-    NAICS,
-    ANY_VALUE(NAICS_TITLE) AS NAICS_TITLE,
-    SUM(TOT_EMP) AS all_time_total_employment,
-    RANK() OVER (ORDER BY SUM(TOT_EMP) DESC) AS all_time_rank
-  FROM oes_db
-  WHERE OCC_CODE IN (${sql_array_str(selected_codes)}) 
-    AND RIGHT(OCC_CODE, 1) != '0'
-  GROUP BY NAICS
-),
-top_x_naics AS (
-  SELECT NAICS
-  FROM all_time_ranked_data
-  WHERE all_time_rank <= ${grouping_limit}
-),
-monthly_data AS (
-  SELECT 
-    REPORT_DATE,
-    NAICS,
-    ANY_VALUE(NAICS_TITLE) AS NAICS_TITLE,
-    SUM(TOT_EMP) AS total_employment
-  FROM oes_db
-  WHERE OCC_CODE IN (${sql_array_str(selected_codes)}) 
-    AND RIGHT(OCC_CODE, 1) != '0'
-  GROUP BY REPORT_DATE, NAICS
-),
-final_data AS (
-  SELECT
-    md.REPORT_DATE,
-    CASE 
-      WHEN txn.NAICS IS NOT NULL THEN md.NAICS 
-      ELSE 'Other'
-    END AS NAICS,
-    CASE 
-      WHEN txn.NAICS IS NOT NULL THEN md.NAICS_TITLE
-      ELSE 'Other Industries'
-    END AS NAICS_TITLE,
-    SUM(md.total_employment) AS total_employment
-  FROM monthly_data md
-  LEFT JOIN top_x_naics txn ON md.NAICS = txn.NAICS
-  GROUP BY 
-    md.REPORT_DATE,
-    CASE 
-      WHEN txn.NAICS IS NOT NULL THEN md.NAICS 
-      ELSE 'Other'
-    END,
-    CASE 
-      WHEN txn.NAICS IS NOT NULL THEN md.NAICS_TITLE
-      ELSE 'Other Industries'
-    END
-)
-SELECT 
-  REPORT_DATE,
-  NAICS,
-  NAICS_TITLE,
-  total_employment
-FROM final_data
-ORDER BY 
-  REPORT_DATE,
-  CASE WHEN NAICS = 'Other' THEN 2 ELSE 1 END,
-  total_employment DESC`
-    ]);
-  
-  return await naics_occ_count
-}
-return {get_naics_counts};
 }});
 
 </script>
@@ -447,12 +398,11 @@ return {get_naics_counts};
 <main id="observablehq-main" class="observablehq">
 <h1 id="healthcare-employment" tabindex="-1"><a class="observablehq-header-anchor" href="#healthcare-employment">Healthcare Employment</a></h1>
 <hr>
-<div class="observablehq observablehq--block"><!--:b6ed26fa:--></div>
-<div class="observablehq observablehq--block"><!--:0deddbdb:--></div>
-<div class="observablehq observablehq--block"><!--:90b4ba8e:--></div>
-<div class="observablehq observablehq--block"><!--:5853914b:--></div>
-<div class="observablehq observablehq--block"><!--:2229528f:--></div>
-<div class="observablehq observablehq--block"><!--:7c4200c9:--></div>
+<div class="observablehq observablehq--block"><!--:5f48620c:--></div>
+<div class="observablehq observablehq--block"><!--:56b0038b:--></div>
+<div class="observablehq observablehq--block"><!--:1d499008:--></div>
+<div class="observablehq observablehq--block"><!--:49b9fbab:--></div>
+<div class="observablehq observablehq--block"><!--:c3a26ed1:--></div>
 <h2 id="1.-healthcare-labor-statistics" tabindex="-1"><a class="observablehq-header-anchor" href="#1.-healthcare-labor-statistics">1. Healthcare Labor Statistics</a></h2>
 <p>Understanding healthcare employment trends provides a "bird's-eye view" of the industry's direction. As clinicians, we often focus solely on our own specialties. This page aims to make broader workforce data accessible, enabling us to grasp the bigger picture of rapidly evolving healthcare staffing patterns.</p>
 <p>By understanding which categories of healthcare professionals are growing or declining, we can better collaborate across disciplines and adapt to changing needs.</p>
@@ -473,7 +423,7 @@ return {get_naics_counts};
 <hr style="padding: 0">
 <div class="observablehq observablehq--block"><!--:81295eed:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:412d3569:-->
+<observablehq-loading></observablehq-loading><!--:99ba7153:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
@@ -490,7 +440,7 @@ return {get_naics_counts};
 <hr style="padding: 0">
 <div class="observablehq observablehq--block"><!--:57a7a245:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:7de05ca3:-->
+<observablehq-loading></observablehq-loading><!--:9ffe7fa9:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
@@ -507,7 +457,7 @@ return {get_naics_counts};
 </div>
 <div class="observablehq observablehq--block"><!--:7df8dd7d:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:cf431e10:-->
+<observablehq-loading></observablehq-loading><!--:e5a4250f:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
@@ -520,9 +470,9 @@ return {get_naics_counts};
 <li>Steady-to-recent decline in <strong>Nursing Assistant (31-1014, 31-1131)</strong> occupation</li>
 </ul>
 </div>
-<div class="observablehq observablehq--block"><!--:059e1e71:--></div>
+<div class="observablehq observablehq--block"><!--:4c5441d2:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:28413580:-->
+<observablehq-loading></observablehq-loading><!--:65b7ace3:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
@@ -538,7 +488,7 @@ return {get_naics_counts};
 </div>
 <div class="observablehq observablehq--block"><!--:fdf68831:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:5f58d673:-->
+<observablehq-loading></observablehq-loading><!--:556f8150:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
@@ -551,15 +501,14 @@ return {get_naics_counts};
 <li>CRNA (certified registered nurse anesthetist) numbers steadily increased since 2012</li>
 </ul>
 </div>
-<div class="observablehq observablehq--block"><!--:d728c679:--></div>
+<div class="observablehq observablehq--block"><!--:b005401e:--></div>
 <div>
-<observablehq-loading></observablehq-loading><!--:d28b79e2:-->
+<observablehq-loading></observablehq-loading><!--:05fcfaa9:-->
 </div>
 <div>
 <b>Bureau of Labor Stats: Detailed Link</b>
 <observablehq-loading></observablehq-loading><!--:f9d766ed:-->
 </div>
-<div class="observablehq observablehq--block"><!--:8bbd7fd6:--></div>
 <hr style="padding: 0">
 <h1 id="references" tabindex="-1"><a class="observablehq-header-anchor" href="#references">References</a></h1>
 <ul>
@@ -573,12 +522,6 @@ return {get_naics_counts};
 <blockquote>
 <p>Jung</p>
 </blockquote>
-<hr>
-<div class="observablehq observablehq--block"><!--:736097ba:--></div>
-<div class="observablehq observablehq--block"><!--:f0fa738e:--></div>
-<div class="observablehq observablehq--block"><!--:56b0038b:--></div>
-<div class="observablehq observablehq--block"><!--:1d499008:--></div>
-<div class="observablehq observablehq--block"><!--:8b1cd534:--></div>
 </main>
 <footer id="observablehq-footer">
 <div>Built with Observable.</div>

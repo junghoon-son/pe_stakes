@@ -330,12 +330,6 @@ const plot_object = counts_plot(get_naics_counts(selected_codes, grouping_limit)
 return {plot_object};
 }});
 
-define({id: "8968f5be", inputs: ["get_naics_counts","selected_codes","grouping_limit","display"], body: async (get_naics_counts,selected_codes,grouping_limit,display) => {
-display(await(
-[...get_naics_counts(selected_codes, grouping_limit)]
-))
-}});
-
 define({id: "141fd360", inputs: ["counts_plot","get_naics_counts","selected_codes"], outputs: ["overall_plot_object"], body: (counts_plot,get_naics_counts,selected_codes) => {
 const overall_plot_object = counts_plot(get_naics_counts(selected_codes, 0))
 return {overall_plot_object};
@@ -1576,7 +1570,6 @@ return {naicc_wages_plot};
   </div>
 </div>
 <div class="observablehq observablehq--block"><!--:9d58e403:--></div>
-<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:8968f5be:--></div>
 <div class="observablehq observablehq--block"><!--:141fd360:--></div>
 <div class="observablehq observablehq--block"><!--:1e565f07:--></div>
 <p><span class="align: right">Source: Bureau of Labor Statistics</span></p>

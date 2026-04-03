@@ -344,10 +344,10 @@ const legendScale = plot_object.scale("color")
 return {legendScale};
 }});
 
-define({id: "4b1f9be5", inputs: ["d3","Plot","lookup_occ_title","lookup_naics_title"], outputs: ["counts_plot"], body: (d3,Plot,lookup_occ_title,lookup_naics_title) => {
+define({id: "fe98dc54", inputs: ["d3","Plot","lookup_occ_title","lookup_naics_title"], outputs: ["counts_plot"], body: (d3,Plot,lookup_occ_title,lookup_naics_title) => {
 const counts_plot = function(data) {
   const y_max = d3.max([...data], d => isNaN(+d.total_employment) ? -Infinity : +d.total_employment)
-  const y_max_padding = y_max + 0.4 * y_max
+  const y_max_padding = y_max + 0.5 * y_max
   const grouping_limit_input = (new Set([...data].map((d) => d.NAICS))).size
   // const plot_height = ;
     return Plot.plot({
@@ -459,16 +459,30 @@ const counts_plot = function(data) {
             //   sort: {y: "x", order: "descending"},
             // }),
             Plot.text(data, {
-              text: d => `${d3.format(".1f")(d.percent_change_since_previous)}%`,
+              text: d => `${d3.format(",.0f")(d.total_employment)}`,
               x: (d) => new Date(d.REPORT_DATE),
               y: "total_employment",
               textAnchor: "start",
-              fontSize: 12,
+              fontSize: 11,
+              fontWeight: 600,
               dx: -3,
               dy: -3,
               rotate: -60,
               fy: "NAICS",
-              fill: (d) => (d.percent_change_since_previous) < 0 ? "red" : "black",
+              fill: "black",
+              sort: {y: "x", order: "descending"},
+            }),
+            Plot.text(data.filter(d => d.percent_change_since_previous != null), {
+              text: d => `${d.percent_change_since_previous >= 0 ? "+" : ""}${d3.format(".1f")(d.percent_change_since_previous)}%`,
+              x: (d) => new Date(d.REPORT_DATE),
+              y: "total_employment",
+              textAnchor: "start",
+              fontSize: 9,
+              dx: -3,
+              dy: -16,
+              rotate: -60,
+              fy: "NAICS",
+              fill: (d) => d.percent_change_since_previous < 0 ? "#c44" : "#999",
               sort: {y: "x", order: "descending"},
             }),
             Plot.ruleY([0])
@@ -1564,7 +1578,7 @@ return {naicc_wages_plot};
 <div class="observablehq observablehq--block"><!--:141fd360:--></div>
 <div class="observablehq observablehq--block"><!--:1e565f07:--></div>
 <p><span class="align: right">Source: Bureau of Labor Statistics</span></p>
-<div class="observablehq observablehq--block"><!--:4b1f9be5:--></div>
+<div class="observablehq observablehq--block"><!--:fe98dc54:--></div>
 <hr>
 <h2 id="national-level%3A-table" tabindex="-1"><a class="observablehq-header-anchor" href="#national-level%3A-table">National-level: Table</a></h2>
 <div class="observablehq observablehq--block"><!--:9975bf56:--></div>

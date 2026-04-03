@@ -1,74 +1,71 @@
 <!DOCTYPE html>
-<html>
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="generator" content="Observable Framework v1.13.3">
 <title>Healthcare Labor Info | Clinicians.fyi</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="preload" as="style" href="./_observablehq/theme-air.aad62322.css">
-<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
-<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
-<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.aad62322.css">
-<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
-<link rel="modulepreload" href="./_observablehq/client.c4601faf.js">
-<link rel="modulepreload" href="./_observablehq/runtime.e080113b.js">
-<link rel="modulepreload" href="./_observablehq/stdlib.e606b126.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/duckdb.3c7d1320.js">
-<link rel="modulepreload" href="./_npm/htl@0.3.1/72f4716c.js">
-<link rel="modulepreload" href="./_observablehq/stdlib/inputs.4d27c77a.js">
-<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/a96a6bbb.js">
-<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/9cffc2bd.js">
-<link rel="modulepreload" href="./_npm/@duckdb/duckdb-wasm@1.29.0/d1cf3c5a.js">
-<link rel="modulepreload" href="./_npm/isoformat@0.2.1/18cbf477.js">
-<link rel="modulepreload" href="./_npm/d3@7.9.0/66d82917.js">
-<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/53fe8176.js">
-<link rel="modulepreload" href="./_npm/apache-arrow@21.1.0/63de76cd.js">
-<link rel="modulepreload" href="./_npm/d3-array@3.2.4/e93ca09f.js">
-<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/0f2de24d.js">
-<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/65eb105b.js">
-<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/7ef8fb2e.js">
-<link rel="modulepreload" href="./_npm/d3-color@3.1.0/aeb57b94.js">
-<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/1d2aed74.js">
-<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/87adea64.js">
-<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/9ba9c7f3.js">
-<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/4202580c.js">
-<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/cdd7e898.js">
-<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/b4e2ad9a.js">
-<link rel="modulepreload" href="./_npm/d3-force@3.0.0/5e804d15.js">
-<link rel="modulepreload" href="./_npm/d3-format@3.1.2/3785bf2d.js">
-<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/40599fb3.js">
-<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/e49e792c.js">
-<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/8d1e5425.js">
-<link rel="modulepreload" href="./_npm/d3-path@3.1.0/20d3f133.js">
-<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/7553081f.js">
-<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/0dfd751c.js">
-<link rel="modulepreload" href="./_npm/d3-random@3.0.1/3c90ee06.js">
-<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/720b7f0a.js">
-<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/ba24c2e7.js">
-<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/4d94e5b7.js">
-<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/6d3a6726.js">
-<link rel="modulepreload" href="./_npm/d3-time@3.1.0/9f03c579.js">
-<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/07c9626f.js">
-<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/b58a267d.js">
-<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/004da2ac.js">
-<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/b5786b3f.js">
-<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/cbf6ba23.js">
-<link rel="modulepreload" href="./_npm/tslib@2.8.1/b62a9c4a.js">
-<link rel="modulepreload" href="./_npm/flatbuffers@25.9.23/c82700c2.js">
-<link rel="modulepreload" href="./_npm/internmap@2.0.3/e08981d9.js">
-<link rel="modulepreload" href="./_npm/delaunator@5.1.0/d4ec0aa1.js">
-<link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/42820bfa.js">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.css">
+<link rel="modulepreload" href="./_observablehq/client.js">
+<link rel="modulepreload" href="./_observablehq/runtime.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/duckdb.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/_esm.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/_esm.js">
+<link rel="modulepreload" href="./_npm/@duckdb/duckdb-wasm@1.28.0/_esm.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/_esm.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/_esm.js">
+<link rel="modulepreload" href="./_npm/apache-arrow@21.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/_esm.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/_esm.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/_esm.js">
+<link rel="modulepreload" href="./_npm/tslib@2.8.1/_esm.js">
+<link rel="modulepreload" href="./_npm/flatbuffers@25.9.23/_esm.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/_esm.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.1.0/_esm.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.3/_esm.js">
 <script type="module">
 
-import {define} from "./_observablehq/client.c4601faf.js";
-import {registerFile, FileAttachment} from "./_observablehq/stdlib.e606b126.js";
-import {registerTable} from "./_observablehq/stdlib/duckdb.3c7d1320.js";
+import {define} from "./_observablehq/client.js";
+import {registerFile, FileAttachment} from "./_observablehq/stdlib.js";
+import {registerTable} from "./_observablehq/stdlib/duckdb.js";
 
-registerFile("./data/oes/processed/naics_lookup_from_data.csv", {"name":"./data/oes/processed/naics_lookup_from_data.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/naics_lookup_from_data.0a57814f.csv","lastModified":1720724332694,"size":26595});
-registerFile("./data/oes/processed/occ_code.csv", {"name":"./data/oes/processed/occ_code.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/occ_code.6848eccf.csv","lastModified":1720323702095,"size":72506});
-registerFile("./data/oes/processed/oes_longitudinal_slim.parquet", {"name":"./data/oes/processed/oes_longitudinal_slim.parquet","path":"./_file/data/oes/processed/oes_longitudinal_slim.30d9d5bc.parquet","lastModified":1720323702068,"size":6400626});
+registerFile("./data/oes/processed/naics_lookup_from_data.csv", {"name":"./data/oes/processed/naics_lookup_from_data.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/naics_lookup_from_data.0a57814f.csv","lastModified":1720724332694});
+registerFile("./data/oes/processed/occ_code.csv", {"name":"./data/oes/processed/occ_code.csv","mimeType":"text/csv","path":"./_file/data/oes/processed/occ_code.6848eccf.csv","lastModified":1720323702095});
+registerFile("./data/oes/processed/oes_longitudinal_slim.parquet", {"name":"./data/oes/processed/oes_longitudinal_slim.parquet","path":"./_file/data/oes/processed/oes_longitudinal_slim.30d9d5bc.parquet","lastModified":1720323702068});
 registerTable("oes_db", FileAttachment("./data/oes/processed/oes_longitudinal_slim.parquet"));
 
 define({id: "b6ed26fa", inputs: ["FileAttachment"], outputs: ["occ_codes","naics_lookup"], body: (FileAttachment) => {
@@ -396,8 +393,6 @@ return {get_naics_counts};
 }});
 
 </script>
-</head>
-<body>
 <input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
 <label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
 <nav id="observablehq-sidebar">
@@ -432,23 +427,23 @@ return {get_naics_counts};
     </ol>
   </details>
 </nav>
-<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
-<div id="observablehq-center">
+<script>{Object.assign(document.createElement("a"),{href:""}).password&&location.replace(location.href);const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
 <aside id="observablehq-toc" data-selector="h1:not(:first-of-type)[id], h2:first-child[id], :not(h1) + h2[id]">
 <nav>
 <div>Contents</div>
 <ol>
-<li class="observablehq-secondary-link"><a href="#1-healthcare-labor-statistics">1. Healthcare Labor Statistics</a></li>
-<li class="observablehq-secondary-link"><a href="#2-physicians">2. Physicians</a></li>
-<li class="observablehq-secondary-link"><a href="#3-registered-nurses">3. Registered Nurses</a></li>
-<li class="observablehq-secondary-link"><a href="#4-nurse-practioners">4. Nurse Practioners</a></li>
-<li class="observablehq-secondary-link"><a href="#5-nurse-assistants">5. Nurse Assistants</a></li>
-<li class="observablehq-secondary-link"><a href="#6-physician-assistants">6. Physician Assistants</a></li>
-<li class="observablehq-secondary-link"><a href="#7-crna">7. CRNA</a></li>
+<li class="observablehq-secondary-link"><a href="#1.-healthcare-labor-statistics">1. Healthcare Labor Statistics</a></li>
+<li class="observablehq-secondary-link"><a href="#2.-physicians">2. Physicians</a></li>
+<li class="observablehq-secondary-link"><a href="#3.-registered-nurses">3. Registered Nurses</a></li>
+<li class="observablehq-secondary-link"><a href="#4.-nurse-practioners">4. Nurse Practioners</a></li>
+<li class="observablehq-secondary-link"><a href="#5.-nurse-assistants">5. Nurse Assistants</a></li>
+<li class="observablehq-secondary-link"><a href="#6.-physician-assistants">6. Physician Assistants</a></li>
+<li class="observablehq-secondary-link"><a href="#7.-crna">7. CRNA</a></li>
 <li class="observablehq-secondary-link"><a href="#references">References</a></li>
 </ol>
 </nav>
 </aside>
+<div id="observablehq-center">
 <main id="observablehq-main" class="observablehq">
 <h1 id="healthcare-employment" tabindex="-1"><a class="observablehq-header-anchor" href="#healthcare-employment">Healthcare Employment</a></h1>
 <hr>
@@ -458,7 +453,7 @@ return {get_naics_counts};
 <div class="observablehq observablehq--block"><!--:5853914b:--></div>
 <div class="observablehq observablehq--block"><!--:2229528f:--></div>
 <div class="observablehq observablehq--block"><!--:7c4200c9:--></div>
-<h2 id="1-healthcare-labor-statistics" tabindex="-1"><a class="observablehq-header-anchor" href="#1-healthcare-labor-statistics">1. Healthcare Labor Statistics</a></h2>
+<h2 id="1.-healthcare-labor-statistics" tabindex="-1"><a class="observablehq-header-anchor" href="#1.-healthcare-labor-statistics">1. Healthcare Labor Statistics</a></h2>
 <p>Understanding healthcare employment trends provides a "bird's-eye view" of the industry's direction. As clinicians, we often focus solely on our own specialties. This page aims to make broader workforce data accessible, enabling us to grasp the bigger picture of rapidly evolving healthcare staffing patterns.</p>
 <p>By understanding which categories of healthcare professionals are growing or declining, we can better collaborate across disciplines and adapt to changing needs.</p>
 <hr>
@@ -467,7 +462,7 @@ return {get_naics_counts};
 <div class="observablehq observablehq--block"><!--:6941ebb8:--></div>
 <div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:43344edb:--></div>
 <hr>
-<h2 id="2-physicians" tabindex="-1"><a class="observablehq-header-anchor" href="#2-physicians">2. Physicians</a></h2>
+<h2 id="2.-physicians" tabindex="-1"><a class="observablehq-header-anchor" href="#2.-physicians">2. Physicians</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li><strong>Year 2004</strong> counts ~160k physicians, suggesting data capture issues in the past.</li>
@@ -485,7 +480,7 @@ return {get_naics_counts};
 <observablehq-loading></observablehq-loading><!--:0d30414e:-->
 </div>
 <hr style="padding: 0">
-<h2 id="3-registered-nurses" tabindex="-1"><a class="observablehq-header-anchor" href="#3-registered-nurses">3. Registered Nurses</a></h2>
+<h2 id="3.-registered-nurses" tabindex="-1"><a class="observablehq-header-anchor" href="#3.-registered-nurses">3. Registered Nurses</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li><strong>Steady uptrend</strong> from 2002 to 2023</li>
@@ -502,7 +497,7 @@ return {get_naics_counts};
 <observablehq-loading></observablehq-loading><!--:f7069a88:-->
 </div>
 <hr style="padding: 0">
-<h2 id="4-nurse-practioners" tabindex="-1"><a class="observablehq-header-anchor" href="#4-nurse-practioners">4. Nurse Practioners</a></h2>
+<h2 id="4.-nurse-practioners" tabindex="-1"><a class="observablehq-header-anchor" href="#4.-nurse-practioners">4. Nurse Practioners</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li><strong>2.5x</strong> number of increase in Nurse Practioners from 2012-2023.</li>
@@ -519,7 +514,7 @@ return {get_naics_counts};
 <observablehq-loading></observablehq-loading><!--:7a81115f:-->
 </div>
 <hr style="padding: 0">
-<h2 id="5-nurse-assistants" tabindex="-1"><a class="observablehq-header-anchor" href="#5-nurse-assistants">5. Nurse Assistants</a></h2>
+<h2 id="5.-nurse-assistants" tabindex="-1"><a class="observablehq-header-anchor" href="#5.-nurse-assistants">5. Nurse Assistants</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li>Steady-to-recent decline in <strong>Nursing Assistant (31-1014, 31-1131)</strong> occupation</li>
@@ -534,7 +529,7 @@ return {get_naics_counts};
 <observablehq-loading></observablehq-loading><!--:5d0381da:-->
 </div>
 <hr style="padding: 0">
-<h2 id="6-physician-assistants" tabindex="-1"><a class="observablehq-header-anchor" href="#6-physician-assistants">6. Physician Assistants</a></h2>
+<h2 id="6.-physician-assistants" tabindex="-1"><a class="observablehq-header-anchor" href="#6.-physician-assistants">6. Physician Assistants</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li><strong>More than 2x</strong> growth of number of Physician Assistants from 2002 to 2023</li>
@@ -550,7 +545,7 @@ return {get_naics_counts};
 <observablehq-loading></observablehq-loading><!--:7f1133b1:-->
 </div>
 <hr style="padding: 0">
-<h2 id="7-crna" tabindex="-1"><a class="observablehq-header-anchor" href="#7-crna">7. CRNA</a></h2>
+<h2 id="7.-crna" tabindex="-1"><a class="observablehq-header-anchor" href="#7.-crna">7. CRNA</a></h2>
 <div class="card" style="padding: 0">
 <ul>
 <li>CRNA (certified registered nurse anesthetist) numbers steadily increased since 2012</li>
@@ -589,5 +584,3 @@ return {get_naics_counts};
 <div>Built with Observable.</div>
 </footer>
 </div>
-</body>
-</html>

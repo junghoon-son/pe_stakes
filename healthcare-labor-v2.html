@@ -88,11 +88,14 @@ const lookup_occ_title = occ_code =>
 return {lookup_occ_title};
 }});
 
-define({id: "42afef24", inputs: ["naics_lookup"], outputs: ["lookup_naics_title"], body: (naics_lookup) => {
-// Lookup function for NAICS codes
+define({id: "308d81e9", inputs: ["raw_state","naics_lookup"], outputs: ["_state_naics_map","lookup_naics_title"], body: (raw_state,naics_lookup) => {
+// Lookup function for NAICS codes — checks national CSV first, then state data
+const _state_naics_map = new Map(raw_state.map(d => [String(d.NAICS), d.NAICS_TITLE]).filter(([,v]) => v));
 const lookup_naics_title = naics_code => 
-  naics_lookup.find(({ NAICS }) => NAICS === naics_code)?.NAICS_TITLE ?? naics_code;
-return {lookup_naics_title};
+  naics_lookup.find(({ NAICS }) => NAICS === String(naics_code))?.NAICS_TITLE 
+  ?? _state_naics_map.get(String(naics_code)) 
+  ?? naics_code;
+return {_state_naics_map,lookup_naics_title};
 }});
 
 define({id: "c0d0c1a5", inputs: ["state_lookup"], outputs: ["lookup_state_name"], body: (state_lookup) => {
@@ -1498,7 +1501,7 @@ return {naicc_wages_plot};
 <hr style="padding: 0">
 <div class="observablehq observablehq--block"><!--:d08e5f0c:--></div>
 <div class="observablehq observablehq--block"><!--:520c85fa:--></div>
-<div class="observablehq observablehq--block"><!--:42afef24:--></div>
+<div class="observablehq observablehq--block"><!--:308d81e9:--></div>
 <div class="observablehq observablehq--block"><!--:c0d0c1a5:--></div>
 <div class="observablehq observablehq--block"><!--:c2d668a3:--></div>
 <!-- ## Search Occupation -->
